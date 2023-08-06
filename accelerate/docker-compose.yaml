@@ -12,6 +12,7 @@ services:
       - ./logs:/root/logs:rw
       - ./hostfile:/root/hostfile:rw
       - ./config:/root/.ssh/config:rw
+      - ./Llama-2-7b-chat-hf:/root/Llama-2-7b-chat-hf:ro
       - ./default_config.yaml:/root/.cache/huggingface/accelerate/default_config.yaml
     # ports:
     #   - 1041:22
@@ -29,6 +30,8 @@ services:
       context: .
       dockerfile: Dockerfile.worker
     command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
+    volumes:
+      - ./Llama-2-7b-chat-hf:/root/Llama-2-7b-chat-hf:ro
     deploy:
       resources:
         reservations:
@@ -43,6 +46,8 @@ services:
       context: .
       dockerfile: Dockerfile.worker
     command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
+    volumes:
+      - ./Llama-2-7b-chat-hf:/root/Llama-2-7b-chat-hf:ro
     deploy:
       resources:
         reservations:
@@ -57,6 +62,8 @@ services:
       context: .
       dockerfile: Dockerfile.worker
     command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
+    volumes:
+      - ./Llama-2-7b-chat-hf:/root/Llama-2-7b-chat-hf:ro
     deploy:
       resources:
         reservations:

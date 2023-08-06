@@ -17,7 +17,8 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, Adafactor
 parser = argparse.ArgumentParser()
 parser.add_argument("-b", "--batch_size", type=int, required=True)
 parser.add_argument("-e", "--epoch", type=int, required=True)
-parser.add_argument("-m", "--max_length", type=int, choices=[128, 256, 512], default=128)
+parser.add_argument("-ml", "--max_length", type=int, choices=[128, 256, 512], default=128)
+parser.add_argument("-mp", "--model_path", type=str, default="Llama-2-7b-chat-hf")
 parser.add_argument("-o", "--optimizer", type=str, choices=["sgd", "adafactor", "adamw"], default="adafactor")
 parser.add_argument("-t", "--test", action="store_true")
 args = parser.parse_args()
@@ -40,7 +41,7 @@ logger = get_logger(__name__)
 
 # Prefix
 dataset_name = "tldr_news"
-model_name = "Llama-2-7b-chat-hf"
+model_name = args.model_path
 
 
 # Create dataset
