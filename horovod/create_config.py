@@ -7,8 +7,8 @@ def write_master_config(network_addr: str, host_addr: int, port: int):
         f.write(f"    User {user}\n")
         f.write(f"    IdentityFile {identity_file}\n")
         f.write(f"    StrictHostKeyChecking no\n\n")
-    with open("run.sh", "a") as f:
-        f.write(f"horovodrun -np $1 -H master:1")
+    with open("hostfile", "a") as f:
+        f.write(f"master slots=1\n")
 
 
 def write_worker_config(network_addr: str, host_addr: int, port: int):
@@ -21,13 +21,9 @@ def write_worker_config(network_addr: str, host_addr: int, port: int):
         f.write(f"    User {user}\n")
         f.write(f"    IdentityFile {identity_file}\n")
         f.write(f"    StrictHostKeyChecking no\n\n")
-    with open("run.sh", "a") as f:
-        f.write(f",worker-{worker_num}:1")
+    with open("hostfile", "a") as f:
+        f.write(f"worker-{worker_num} slots=1\n")
     worker_num += 1
-
-def write_last_line():
-    with open("run.sh", "a") as f:
-        f.write(f" python3 train_multi.py -e 1 -b 16 -t\n")
 
 
 if __name__ == "__main__":
@@ -46,7 +42,6 @@ if __name__ == "__main__":
     while True:
         host_addr = int(input("Input Worker's Host Address: "))
         if host_addr == -1:
-            write_last_line()
             print("Exit")
             break
         for i in range(0, slot_count):

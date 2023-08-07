@@ -10,6 +10,7 @@ services:
     command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
     volumes:
       - ./logs:/root/logs:rw
+      - ./hostfile:/root/hostfile:rw
       - ./config:/root/.ssh/config:rw
       - ./Llama-2-7b-chat-hf:/root/Llama-2-7b-chat-hf:ro
     # ports:
