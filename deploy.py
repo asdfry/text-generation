@@ -15,7 +15,7 @@ def create_master(node, port, gpu):
                 {
                     "name": "app",
                     "image": f"{args.image_name}-master",
-                    "imagePullPolicy": "Always",
+                    # "imagePullPolicy": "Always",
                     "command": [
                         "/bin/bash",
                         "-c",
@@ -47,7 +47,7 @@ def create_worker(node, port, gpu):
                 {
                     "name": "app",
                     "image": f"{args.image_name}-worker",
-                    "imagePullPolicy": "Always",
+                    # "imagePullPolicy": "Always",
                     "command": [
                         "/bin/bash",
                         "-c",
