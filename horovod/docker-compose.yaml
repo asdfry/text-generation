@@ -3,7 +3,7 @@ version: "3.6"
 services:
 
   master:
-    image: asdfry/test-generation:horovod-master
+    image: asdfry/text-generation:horovod-master
     build:
       context: .
       dockerfile: Dockerfile.master
@@ -23,7 +23,7 @@ services:
             capabilities: [gpu]
 
   worker-1:
-    image: asdfry/test-generation:horovod-worker
+    image: asdfry/text-generation:horovod-worker
     build:
       context: .
       dockerfile: Dockerfile.worker
@@ -39,7 +39,7 @@ services:
             capabilities: [gpu]
 
   worker-2:
-    image: asdfry/test-generation:horovod-worker
+    image: asdfry/text-generation:horovod-worker
     build:
       context: .
       dockerfile: Dockerfile.worker
@@ -55,7 +55,7 @@ services:
             capabilities: [gpu]
 
   worker-3:
-    image: asdfry/test-generation:horovod-worker
+    image: asdfry/text-generation:horovod-worker
     build:
       context: .
       dockerfile: Dockerfile.worker
