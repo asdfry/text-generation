@@ -3,7 +3,7 @@ version: "3.6"
 services:
 
   master:
-    image: asdfry/text-generation:horovod-master
+    image: asdfry/text-generation:horovod-master-${version}
     build:
       context: .
       dockerfile: Dockerfile.master
@@ -23,7 +23,7 @@ services:
             capabilities: [gpu]
 
   worker-1:
-    image: asdfry/text-generation:horovod-worker
+    image: asdfry/text-generation:horovod-worker-${version}
     build:
       context: .
       dockerfile: Dockerfile.worker
@@ -38,34 +38,34 @@ services:
             device_ids: ['2', '3']
             capabilities: [gpu]
 
-  worker-2:
-    image: asdfry/text-generation:horovod-worker
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
-    command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
-    volumes:
-      - ./Llama-2-7b-chat-hf:/root/Llama-2-7b-chat-hf:ro
-    deploy:
-      resources:
-        reservations:
-          devices:
-          - driver: nvidia
-            device_ids: ['4', '5']
-            capabilities: [gpu]
+  # worker-2:
+  #   image: asdfry/text-generation:horovod-worker-${version}
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.worker
+  #   command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
+  #   volumes:
+  #     - ./Llama-2-7b-chat-hf:/root/Llama-2-7b-chat-hf:ro
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #         - driver: nvidia
+  #           device_ids: ['4', '5']
+  #           capabilities: [gpu]
 
-  worker-3:
-    image: asdfry/text-generation:horovod-worker
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
-    command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
-    volumes:
-      - ./Llama-2-7b-chat-hf:/root/Llama-2-7b-chat-hf:ro
-    deploy:
-      resources:
-        reservations:
-          devices:
-          - driver: nvidia
-            device_ids: ['6', '7']
-            capabilities: [gpu]
+  # worker-3:
+  #   image: asdfry/text-generation:horovod-worker-${version}
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.worker
+  #   command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
+  #   volumes:
+  #     - ./Llama-2-7b-chat-hf:/root/Llama-2-7b-chat-hf:ro
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #         - driver: nvidia
+  #           device_ids: ['6', '7']
+  #           capabilities: [gpu]

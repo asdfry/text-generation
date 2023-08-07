@@ -14,7 +14,7 @@ def create_master(node, port, gpu):
             "containers": [
                 {
                     "name": "app",
-                    "image": f"{args.image_name}-master",
+                    "image": f"{args.image_name}-master-{args.version}",
                     # "imagePullPolicy": "Always",
                     "command": [
                         "/bin/bash",
@@ -46,7 +46,7 @@ def create_worker(node, port, gpu):
             "containers": [
                 {
                     "name": "app",
-                    "image": f"{args.image_name}-worker",
+                    "image": f"{args.image_name}-worker-{args.version}",
                     # "imagePullPolicy": "Always",
                     "command": [
                         "/bin/bash",
@@ -69,10 +69,11 @@ def create_worker(node, port, gpu):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--image_name", type=str, required=True)
+    parser.add_argument("-m", "--master_node_num", type=int, required=True)
     parser.add_argument("-s", "--slot_size", type=int, required=True)
     parser.add_argument("-t", "--total_node", type=int, required=True)
-    parser.add_argument("-m", "--master_node_num", type=int, required=True)
-    parser.add_argument("-i", "--image_name", type=str, required=True)
+    parser.add_argument("-v", "--version", type=str, required=True)
     parser.add_argument("-gm", "--gpu_master", type=str, required=True)
     parser.add_argument("-gw", "--gpu_worker", type=str, required=True)
     args = parser.parse_args()
