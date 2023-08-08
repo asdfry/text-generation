@@ -5,22 +5,23 @@ import argparse
 import evaluate
 
 from datetime import datetime
+from datasets import load_from_disk
 from accelerate import Accelerator
 from torch.optim import SGD, AdamW
+from transformers import AutoTokenizer, AutoModelForCausalLM, Adafactor
 from torch.utils.data import DataLoader
 from accelerate.logging import get_logger
-from datasets import load_from_disk
-from transformers import AutoTokenizer, AutoModelForCausalLM, Adafactor
 
 
 # Argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-b", "--batch_size", type=int, required=True)
 parser.add_argument("-e", "--epoch", type=int, required=True)
-parser.add_argument("-ml", "--max_length", type=int, choices=[128, 256, 512], default=128)
-parser.add_argument("-mp", "--model_path", type=str, default="pretrained-model/Llama-2-7b-chat-hf")
+parser.add_argument("-n", "--num_proc", type=int, default=2)
 parser.add_argument("-o", "--optimizer", type=str, choices=["sgd", "adafactor", "adamw"], default="adafactor")
 parser.add_argument("-t", "--test", action="store_true")
+parser.add_argument("-ml", "--max_length", type=int, choices=[128, 256, 512], default=128)
+parser.add_argument("-mp", "--model_path", type=str, default="pretrained-model/Llama-2-7b-chat-hf")
 args = parser.parse_args()
 
 
@@ -65,7 +66,7 @@ def tokenize_function(examples):
 tokenized_datasets = datasets.map(
     tokenize_function,
     batched=True,
-    num_proc=16,
+    num_proc=args.num_proc,
     remove_columns=datasets["train"].column_names,  # remove columns that are not required for model input
 )
 tokenized_datasets.set_format("torch")
@@ -88,7 +89,7 @@ model = AutoModelForCausalLM.from_pretrained(model_name)
 
 # Set optimizer
 if args.optimizer == "sgd":
-    optimizer = SGD(model.parameters())
+    optimizer = SGD(model.parameters(), lr=1e-5)
 elif args.optimizer == "adafactor":
     optimizer = Adafactor(model.parameters())
 elif args.optimizer == "adamw":
