@@ -13,10 +13,11 @@ def create_persistent_volume():
     #         host_path=client.V1HostPathVolumeSource(path="/data/my-pv")
     #     )
     # )
+    name = "jsh-pv"
     pv_manifest = {
         "apiVersion": "v1",
         "kind": "PersistentVolume",
-        "metadata": {"name": "jsh-pv"},
+        "metadata": {"name": name},
         "spec": {
             "storageClassName": "llama2",
             "capacity": {"storage": f"{args.storage_size}Gi"},
@@ -25,6 +26,7 @@ def create_persistent_volume():
         },
     }
     v1.create_persistent_volume(pv_manifest)
+    print(f"PV (name: {name}, capacity: {args.storage_size}Gi)")
 
 
 def create_persistent_volume_claim():
@@ -36,10 +38,11 @@ def create_persistent_volume_claim():
     #         resources=client.V1ResourceRequirements(requests={"storage": f"{args.storage_size}Gi"}),
     #     ),
     # )
+    name = "jsh-pvc"
     pvc_manifest = {
         "apiVersion": "v1",
         "kind": "PersistentVolumeClaim",
-        "metadata": {"name": "jsh-pvc"},
+        "metadata": {"name": name},
         "spec": {
             "storageClassName": "llama2",
             "accessModes": [access_mode],
@@ -48,6 +51,7 @@ def create_persistent_volume_claim():
         },
     }
     v1.create_namespaced_persistent_volume_claim(namespace, pvc_manifest)
+    print(f"PVC (name: {name}, request: {args.storage_size}Gi)")
 
 
 if __name__ == "__main__":

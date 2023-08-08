@@ -38,6 +38,7 @@ def create_master(node, port, gpu):
         },
     }
     v1.create_namespaced_pod(namespace, pod_manifest)
+    print(f"POD (name: {pod_manifest['metadata']['name']}, node: {node}, port: {port})")
 
 
 def create_worker(node, port, gpu):
@@ -77,6 +78,7 @@ def create_worker(node, port, gpu):
     }
     v1.create_namespaced_pod(namespace, pod_manifest)
     worker_num += 1
+    print(f"POD (name: {pod_manifest['metadata']['name']}, node: {node}, port: {port})")
 
 
 if __name__ == "__main__":
