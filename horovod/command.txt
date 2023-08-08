@@ -1,0 +1,1 @@
+horovodrun -np 8 -hostfile hostfile python3 train_multi.py -b 8 -e 1 -ml 256

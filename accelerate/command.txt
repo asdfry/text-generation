@@ -1,0 +1,1 @@
+accelerate launch train_multi.py -b 8 -e 1 -ml 256
