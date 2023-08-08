@@ -7,7 +7,11 @@ def create_master(node, port, gpu):
     pod_manifest = {
         "apiVersion": "v1",
         "kind": "Pod",
-        "metadata": {"name": "master", "namespace": namespace},
+        "metadata": {
+            "name": "master",
+            "namespace": namespace,
+            "labels": {"ten1010.io/creator-name": "jsh"},
+        },
         "spec": {
             "hostNetwork": True,
             "nodeSelector": {"kubernetes.io/hostname": node},
@@ -16,6 +20,7 @@ def create_master(node, port, gpu):
                     "name": "app",
                     "image": f"{args.image_name}-master-{args.version}",
                     # "imagePullPolicy": "Always",
+                    "volumeMounts": [{"name": "pretrained-model", "mountPath": "/root/pretrained-model"}],
                     "command": [
                         "/bin/bash",
                         "-c",
@@ -29,6 +34,7 @@ def create_master(node, port, gpu):
                     },
                 },
             ],
+            "volumes": [{"name": "pretrained-model", "persistentVolumeClaim": {"claimName": "jsh-pvc"}}],
         },
     }
     v1.create_namespaced_pod(namespace, pod_manifest)
@@ -39,7 +45,11 @@ def create_worker(node, port, gpu):
     pod_manifest = {
         "apiVersion": "v1",
         "kind": "Pod",
-        "metadata": {"name": f"worker-{worker_num}", "namespace": namespace},
+        "metadata": {
+            "name": f"worker-{worker_num}",
+            "namespace": namespace,
+            "labels": {"ten1010.io/creator-name": "jsh"},
+        },
         "spec": {
             "hostNetwork": True,
             "nodeSelector": {"kubernetes.io/hostname": node},
@@ -48,6 +58,7 @@ def create_worker(node, port, gpu):
                     "name": "app",
                     "image": f"{args.image_name}-worker-{args.version}",
                     # "imagePullPolicy": "Always",
+                    "volumeMounts": [{"name": "pretrained-model", "mountPath": "/root/pretrained-model"}],
                     "command": [
                         "/bin/bash",
                         "-c",
@@ -61,6 +72,7 @@ def create_worker(node, port, gpu):
                     },
                 },
             ],
+            "volumes": [{"name": "pretrained-model", "persistentVolumeClaim": {"claimName": "jsh-pvc"}}],
         },
     }
     v1.create_namespaced_pod(namespace, pod_manifest)

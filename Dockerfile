@@ -2,6 +2,7 @@ FROM python:3.10.6-slim
 
 WORKDIR /root
 
+COPY create_volume.py create_volume.py
 COPY deploy.py deploy.py
 
 RUN echo "alias ll='ls -al'" >> ~/.bashrc && \
