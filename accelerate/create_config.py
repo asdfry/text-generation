@@ -32,7 +32,7 @@ if __name__ == "__main__":
     identity_file = input("Input Identity File: ")
     slot_count = int(input("Input Slot Count: "))
 
-    network_addr = input("Input Master's Network Address: ")
+    network_addr = input("Input Network Address: ")
     host_addr = int(input("Input Master's Host Address: "))
 
     write_master_config(network_addr, host_addr, 1041)
