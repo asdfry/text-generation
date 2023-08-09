@@ -160,7 +160,7 @@ cython_debug/
 #.idea/
 .vscode/
 tldr_news
-Llama-2-7b-chat-hf
+pretrained-models/
 models/
 logs/*.log
 authorized_keys

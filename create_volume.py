@@ -19,7 +19,7 @@ def create_persistent_volume():
         "kind": "PersistentVolume",
         "metadata": {"name": name},
         "spec": {
-            "storageClassName": "llama2",
+            "storageClassName": "pretrained-models",
             "capacity": {"storage": f"{args.storage_size}Gi"},
             "accessModes": [access_mode],
             "nfs": {"path": args.host_path, "server": "k8s-node-1.idc-1.ten1010.io"},
@@ -44,7 +44,7 @@ def create_persistent_volume_claim():
         "kind": "PersistentVolumeClaim",
         "metadata": {"name": name},
         "spec": {
-            "storageClassName": "llama2",
+            "storageClassName": "pretrained-models",
             "accessModes": [access_mode],
             "resources": {"requests": {"storage": f"{args.storage_size}Gi"}},
             "volumeName": "jsh-pv",
@@ -56,7 +56,7 @@ def create_persistent_volume_claim():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--storage_size", type=int, default=60)
+    parser.add_argument("-s", "--storage_size", type=int, default=100)
     parser.add_argument("-p", "--host_path", type=str, required=True)
     args = parser.parse_args()
 

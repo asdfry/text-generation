@@ -21,7 +21,7 @@ parser.add_argument("-n", "--num_proc", type=int, default=2)
 parser.add_argument("-o", "--optimizer", type=str, choices=["sgd", "adafactor", "adamw"], default="adafactor")
 parser.add_argument("-t", "--test", action="store_true")
 parser.add_argument("-ml", "--max_length", type=int, choices=[128, 256, 512], default=128)
-parser.add_argument("-mp", "--model_path", type=str, default="pretrained-model/Llama-2-7b-chat-hf")
+parser.add_argument("-mp", "--model_path", type=str, default="LLaMA-2-7B-32K")
 args = parser.parse_args()
 
 
@@ -42,7 +42,7 @@ logger = get_logger(__name__)
 
 # Prefix
 dataset_name = "tldr_news"
-model_name = args.model_path
+model_path = f"pretrained-models/{args.model_path}"
 
 
 # Create dataset
@@ -50,7 +50,7 @@ datasets = load_from_disk(dataset_name)
 
 
 # Load tokenizer
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(model_path)
 tokenizer.pad_token = tokenizer.eos_token
 
 
@@ -84,7 +84,7 @@ else:
 
 
 # Load model
-model = AutoModelForCausalLM.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_path)
 
 
 # Set optimizer
@@ -153,6 +153,6 @@ for epoch in range(args.epoch):
     # unwraped_model.save_pretrained(save_path)
     # logger.info(f"model saved: {save_path}")
 
-    metric = metric.compute(model_id=model_name)
+    metric = metric.compute(model_id=model_path)
     logger.info(f"[epoch {epoch+1}] mean perplexity: {metric['mean_perplexity']}")
     logger.info(f"[epoch {epoch+1}] elapsed time: {time.time() - start_time} sec")

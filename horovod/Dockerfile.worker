@@ -47,7 +47,5 @@ RUN apt-get install -y cmake python3.10-dev && \
 
 # Copy files that required for training
 RUN mkdir logs
-COPY create_config.py create_config.py
 COPY tldr_news tldr_news
-# COPY Llama-2-7b-chat-hf Llama-2-7b-chat-hf
 COPY train_multi.py train_multi.py

@@ -32,5 +32,4 @@ RUN apt-get install -y curl python3.10-distutils && \
 # Copy files that required for training
 RUN mkdir logs
 COPY tldr_news tldr_news
-# COPY Llama-2-7b-chat-hf Llama-2-7b-chat-hf
 COPY train_multi.py train_multi.py

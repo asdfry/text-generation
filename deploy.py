@@ -20,7 +20,7 @@ def create_master(node, port, gpu):
                     "name": "app",
                     "image": f"{args.image_name}-master-{args.version}",
                     # "imagePullPolicy": "Always",
-                    "volumeMounts": [{"name": "pretrained-model", "mountPath": "/root/pretrained-model"}],
+                    "volumeMounts": [{"name": "pretrained-models", "mountPath": "/root"}],
                     "command": [
                         "/bin/bash",
                         "-c",
@@ -34,7 +34,7 @@ def create_master(node, port, gpu):
                     },
                 },
             ],
-            "volumes": [{"name": "pretrained-model", "persistentVolumeClaim": {"claimName": "jsh-pvc"}}],
+            "volumes": [{"name": "pretrained-models", "persistentVolumeClaim": {"claimName": "jsh-pvc"}}],
         },
     }
     v1.create_namespaced_pod(namespace, pod_manifest)
@@ -59,7 +59,7 @@ def create_worker(node, port, gpu):
                     "name": "app",
                     "image": f"{args.image_name}-worker-{args.version}",
                     # "imagePullPolicy": "Always",
-                    "volumeMounts": [{"name": "pretrained-model", "mountPath": "/root/pretrained-model"}],
+                    "volumeMounts": [{"name": "pretrained-models", "mountPath": "/root"}],
                     "command": [
                         "/bin/bash",
                         "-c",
@@ -73,7 +73,7 @@ def create_worker(node, port, gpu):
                     },
                 },
             ],
-            "volumes": [{"name": "pretrained-model", "persistentVolumeClaim": {"claimName": "jsh-pvc"}}],
+            "volumes": [{"name": "pretrained-models", "persistentVolumeClaim": {"claimName": "jsh-pvc"}}],
         },
     }
     v1.create_namespaced_pod(namespace, pod_manifest)
