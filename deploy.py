@@ -20,7 +20,7 @@ def create_master(node, port, gpu):
                     "name": "app",
                     "image": f"{args.image_name}-master-{args.version}",
                     # "imagePullPolicy": "Always",
-                    "volumeMounts": [{"name": "pretrained-models", "mountPath": "/root"}],
+                    "volumeMounts": [{"name": "pretrained-models", "mountPath": "/root/pretrained-models"}],
                     "command": [
                         "/bin/bash",
                         "-c",

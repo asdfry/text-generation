@@ -1,1 +1,1 @@
-python deploy.py -i asdfry/text-generation:accelerate -m 2 -s 2 -t 1 -v 20230808 -gm ten1010.io/gpu-nvidia-a100-pcie-40gb -gw ten1010.io/gpu-nvidia-a100-pcie-40gb
+python deploy.py -i asdfry/text-generation:accelerate -m 2 -s 2 -t 2 -v 20230809 -gm ten1010.io/gpu-nvidia-a100-pcie-40gb -gw ten1010.io/gpu-tesla-t4
