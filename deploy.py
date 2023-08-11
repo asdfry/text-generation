@@ -59,7 +59,7 @@ def create_worker(node, port, gpu):
                     "name": "app",
                     "image": f"{args.image_name}-worker-{args.version}",
                     # "imagePullPolicy": "Always",
-                    "volumeMounts": [{"name": "pretrained-models", "mountPath": "/root"}],
+                    "volumeMounts": [{"name": "pretrained-models", "mountPath": "/root/pretrained-models"}],
                     "command": [
                         "/bin/bash",
                         "-c",
