@@ -1,1 +1,1 @@
-horovodrun -np 8 -hostfile hostfile python3 train_multi.py -b 8 -e 1 -ml 256
+horovodrun -np 4 -hostfile hostfile --network-interfaces "ib1,ib2" python3 train_multi.py -b 8 -e 1 -ml 128
