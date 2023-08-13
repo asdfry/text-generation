@@ -19,6 +19,7 @@ def create_master(node, port, gpu):
                 {
                     "name": "app",
                     "image": f"{args.image_name}-master-{args.version}",
+                    "env": [{"name": "NCCL_SOCKET_IFNAME", "value": f"ib{port-1040}"}],
                     # "imagePullPolicy": "Always",
                     "volumeMounts": [{"name": "pretrained-models", "mountPath": "/root/pretrained-models"}],
                     "command": [
@@ -58,6 +59,7 @@ def create_worker(node, port, gpu):
                 {
                     "name": "app",
                     "image": f"{args.image_name}-worker-{args.version}",
+                    "env": [{"name": "NCCL_SOCKET_IFNAME", "value": f"ib{port-1040}"}],
                     # "imagePullPolicy": "Always",
                     "volumeMounts": [{"name": "pretrained-models", "mountPath": "/root/pretrained-models"}],
                     "command": [
