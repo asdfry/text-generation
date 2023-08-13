@@ -1,3 +1,6 @@
+import os
+
+
 def write_master_config(network_addr: str, host_addr: int, port: int):
     hostname = f"{network_addr}.{host_addr}"
     with open(".ssh/config", "a") as f:
@@ -27,6 +30,7 @@ def write_worker_config(network_addr: str, host_addr: int, port: int):
 
 
 def write_accelerate_config(network_addr: str, host_addr: int, worker_num: int):
+    os.makedirs(".cache/huggingface/accelerate")
     with open(".cache/huggingface/accelerate/default_config.yaml", "w+") as f:
         f.write(
             f"compute_environment: LOCAL_MACHINE\n"
