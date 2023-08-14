@@ -4,6 +4,8 @@ from kubernetes import client, config
 
 
 def create_master(node, port, gpu):
+    global host_addr
+    ip = f"{network_addr}.{host_addr}"
     pod_manifest = {
         "apiVersion": "v1",
         "kind": "Pod",
@@ -27,7 +29,7 @@ def create_master(node, port, gpu):
                         "-c",
                         f"/usr/sbin/sshd -p {port} && sleep infinity",
                     ],
-                    "ports": [{"containerPort": port}],
+                    "ports": [{"containerPort": port, "hostIP": ip, "hostPort": port}],
                     "resources": {
                         "limits": {
                             gpu: "1",
@@ -39,11 +41,13 @@ def create_master(node, port, gpu):
         },
     }
     v1.create_namespaced_pod(namespace, pod_manifest)
-    print(f"POD (name: {pod_manifest['metadata']['name']}, node: {node}, port: {port})")
+    print(f"POD (name: {pod_manifest['metadata']['name']}, node: {node}, ip: {ip}, port: {port})")
+    host_addr += 1
 
 
 def create_worker(node, port, gpu):
-    global worker_num
+    global worker_num, host_addr
+    ip = f"{network_addr}.{host_addr}"
     pod_manifest = {
         "apiVersion": "v1",
         "kind": "Pod",
@@ -67,7 +71,7 @@ def create_worker(node, port, gpu):
                         "-c",
                         f"/usr/sbin/sshd -p {port} && sleep infinity",
                     ],
-                    "ports": [{"containerPort": port}],
+                    "ports": [{"containerPort": port, "hostIP": ip, "hostPort": port}],
                     "resources": {
                         "limits": {
                             gpu: "1",
@@ -79,17 +83,19 @@ def create_worker(node, port, gpu):
         },
     }
     v1.create_namespaced_pod(namespace, pod_manifest)
+    print(f"POD (name: {pod_manifest['metadata']['name']}, node: {node}, ip: {ip}, port: {port})")
+    host_addr += 1
     worker_num += 1
-    print(f"POD (name: {pod_manifest['metadata']['name']}, node: {node}, port: {port})")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--image_name", type=str, required=True)
-    parser.add_argument("-m", "--master_node_num", type=int, required=True)
     parser.add_argument("-s", "--slot_size", type=int, required=True)
     parser.add_argument("-t", "--total_node", type=int, required=True)
     parser.add_argument("-v", "--version", type=str, required=True)
+    parser.add_argument("-ma", "--master_addr", type=str, required=True)
+    parser.add_argument("-mn", "--master_node_num", type=int, required=True)
     parser.add_argument("-gm", "--gpu_master", type=str, required=True)
     parser.add_argument("-gw", "--gpu_worker", type=str, required=True)
     args = parser.parse_args()
@@ -99,6 +105,9 @@ if __name__ == "__main__":
 
     namespace = "jsh"
     worker_num = 1
+    addr = args.master_addr
+    network_addr = addr[: addr.rfind(".")]
+    host_addr = addr.split(".")[-1]
 
     node = f"k8s-node-{args.master_node_num}"
     create_master(node, 1041, args.gpu_master)
