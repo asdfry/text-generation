@@ -20,8 +20,7 @@ ENV HF_DATASETS_OFFLINE=1
 
 # Set locale and Install packages
 RUN apt-get update && \
-    apt-get install -y iputils-ping language-pack-ko vim openssh-server git && \
-    echo export LC_ALL="ko_KR.UTF-8" >> ~/.bashrc && \
+    apt-get install -y iputils-ping vim openssh-server git && \
     mkdir -p /var/run/sshd
 
 # Set for ssh
