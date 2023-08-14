@@ -1,35 +1,41 @@
 import os
+import argparse
 
 
-def write_master_config(network_addr: str, host_addr: int, port: int):
+def write_master_config(network_addr: str, port: int):
+    global host_addr
     hostname = f"{network_addr}.{host_addr}"
     with open(".ssh/config", "a") as f:
         f.write(f"Host master\n")
         f.write(f"    HostName {hostname}\n")
         f.write(f"    Port {port}\n")
-        f.write(f"    User {user}\n")
-        f.write(f"    IdentityFile {identity_file}\n")
+        f.write(f"    User root\n")
+        f.write(f"    IdentityFile /root/.ssh/key.pem\n")
         f.write(f"    StrictHostKeyChecking no\n\n")
     with open("hostfile", "a") as f:
         f.write(f"master slots=1\n")
+    print(f"Node (name: master, addr: {hostname}, port: {port})")
+    host_addr += 1
 
 
-def write_worker_config(network_addr: str, host_addr: int, port: int):
-    global worker_num
+def write_worker_config(network_addr: str, port: int):
+    global worker_num, host_addr
     hostname = f"{network_addr}.{host_addr}"
     with open(".ssh/config", "a") as f:
         f.write(f"Host worker-{worker_num}\n")
         f.write(f"    HostName {hostname}\n")
         f.write(f"    Port {port}\n")
-        f.write(f"    User {user}\n")
-        f.write(f"    IdentityFile {identity_file}\n")
+        f.write(f"    User root\n")
+        f.write(f"    IdentityFile /root/.ssh/key.pem\n")
         f.write(f"    StrictHostKeyChecking no\n\n")
     with open("hostfile", "a") as f:
         f.write(f"worker-{worker_num} slots=1\n")
+    print(f"Node (name: worker-{worker_num}, addr: {hostname}, port: {port})")
+    host_addr += 1
     worker_num += 1
 
 
-def write_accelerate_config(network_addr: str, host_addr: int, worker_num: int):
+def write_accelerate_config(master_addr: str, worker_num: int):
     os.makedirs(".cache/huggingface/accelerate")
     with open(".cache/huggingface/accelerate/default_config.yaml", "w+") as f:
         f.write(
@@ -43,7 +49,7 @@ def write_accelerate_config(network_addr: str, host_addr: int, worker_num: int):
             f"distributed_type: DEEPSPEED\n"
             f"downcast_bf16: 'no'\n"
             f"machine_rank: 0\n"
-            f"main_process_ip: {network_addr}.{host_addr}\n"
+            f"main_process_ip: {master_addr}\n"
             f"main_process_port: 1040\n"
             f"main_training_function: main\n"
             f"mixed_precision: 'no'\n"
@@ -60,23 +66,22 @@ def write_accelerate_config(network_addr: str, host_addr: int, worker_num: int):
 
 if __name__ == "__main__":
     worker_num = 1
-    user = input("Input User: ")
-    identity_file = input("Input Identity File: ")
-    slot_count = int(input("Input Slot Count: "))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--slot_size", type=int, required=True)
+    parser.add_argument("-t", "--total_node", type=int, required=True)
+    parser.add_argument("-m", "--master_addr", type=str, required=True)
+    args = parser.parse_args()
 
-    network_addr = input("Input Network Address: ")
-    host_addr_master = int(input("Input Master's Host Address: "))
+    addr = args.master_addr
+    network_addr = addr[: addr.rfind(".")]
+    host_addr = addr.split(".")[-1]
 
-    write_master_config(network_addr, host_addr_master, 1041)
-    for i in range(1, slot_count):
-        write_worker_config(network_addr, host_addr_master + i, 1041 + i)
+    write_master_config(network_addr, host_addr, 1041)
+    for i in range(1, args.slot_count):
+        write_worker_config(network_addr, host_addr, 1041 + i)
 
-    while True:
-        host_addr_worker = int(input("Input Worker's Host Address: "))
-        if host_addr_worker == -1:
-            print("Exit")
-            break
-        for i in range(0, slot_count):
-            write_worker_config(network_addr, host_addr_worker + i, 1041 + i)
+    for _ in range(1, args.total_node):
+        for i in range(0, args.slot_count):
+            write_worker_config(network_addr, host_addr, 1041 + i)
 
-    write_accelerate_config(network_addr, host_addr_master, worker_num)
+    write_accelerate_config(addr, worker_num)
