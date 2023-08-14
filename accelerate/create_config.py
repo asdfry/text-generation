@@ -14,7 +14,7 @@ def write_master_config(network_addr: str, port: int):
         f.write(f"    StrictHostKeyChecking no\n\n")
     with open("hostfile", "a") as f:
         f.write(f"master slots=1\n")
-    print(f"Node (name: master, addr: {hostname}, port: {port})")
+    print(f"NODE (name: master, addr: {hostname}, port: {port})")
     host_addr += 1
 
 
@@ -30,7 +30,7 @@ def write_worker_config(network_addr: str, port: int):
         f.write(f"    StrictHostKeyChecking no\n\n")
     with open("hostfile", "a") as f:
         f.write(f"worker-{worker_num} slots=1\n")
-    print(f"Node (name: worker-{worker_num}, addr: {hostname}, port: {port})")
+    print(f"NODE (name: worker-{worker_num}, addr: {hostname}, port: {port})")
     host_addr += 1
     worker_num += 1
 
