@@ -39,34 +39,34 @@ services:
             device_ids: ['2', '3']
             capabilities: [gpu]
 
-  worker-2:
-    image: asdfry/text-generation:horovod-worker-${version}
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
-    command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
-    volumes:
-      - ./pretrained-models:/root/pretrained-models:ro
-    deploy:
-      resources:
-        reservations:
-          devices:
-          - driver: nvidia
-            device_ids: ['4', '5']
-            capabilities: [gpu]
+  # worker-2:
+  #   image: asdfry/text-generation:horovod-worker-${version}
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.worker
+  #   command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
+  #   volumes:
+  #     - ./pretrained-models:/root/pretrained-models:ro
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #         - driver: nvidia
+  #           device_ids: ['4', '5']
+  #           capabilities: [gpu]
 
-  worker-3:
-    image: asdfry/text-generation:horovod-worker-${version}
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
-    command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
-    volumes:
-      - ./pretrained-models:/root/pretrained-models:ro
-    deploy:
-      resources:
-        reservations:
-          devices:
-          - driver: nvidia
-            device_ids: ['6', '7']
-            capabilities: [gpu]
+  # worker-3:
+  #   image: asdfry/text-generation:horovod-worker-${version}
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.worker
+  #   command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
+  #   volumes:
+  #     - ./pretrained-models:/root/pretrained-models:ro
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #         - driver: nvidia
+  #           device_ids: ['6', '7']
+  #           capabilities: [gpu]
