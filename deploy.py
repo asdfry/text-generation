@@ -107,7 +107,7 @@ if __name__ == "__main__":
     worker_num = 1
     addr = args.master_addr
     network_addr = addr[: addr.rfind(".")]
-    host_addr = addr.split(".")[-1]
+    host_addr = int(addr.split(".")[-1])
 
     node = f"k8s-node-{args.master_node_num}"
     create_master(node, 1041, args.gpu_master)
