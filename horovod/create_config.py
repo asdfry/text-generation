@@ -44,12 +44,12 @@ if __name__ == "__main__":
 
     addr = args.master_addr
     network_addr = addr[: addr.rfind(".")]
-    host_addr = addr.split(".")[-1]
+    host_addr = int(addr.split(".")[-1])
 
     write_master_config(network_addr, 1041)
-    for i in range(1, args.slot_count):
+    for i in range(1, args.slot_size):
         write_worker_config(network_addr, 1041 + i)
 
     for _ in range(1, args.total_node):
-        for i in range(0, args.slot_count):
+        for i in range(0, args.slot_size):
             write_worker_config(network_addr, 1041 + i)
