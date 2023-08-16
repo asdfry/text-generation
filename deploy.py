@@ -103,7 +103,7 @@ if __name__ == "__main__":
     config.load_kube_config()
     v1 = client.CoreV1Api()
 
-    namespace = "jsh"
+    namespace = "common"
     worker_num = 1
     addr = args.master_addr
     network_addr = addr[: addr.rfind(".")]

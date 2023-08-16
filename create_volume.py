@@ -63,7 +63,7 @@ if __name__ == "__main__":
     config.load_kube_config()
     v1 = client.CoreV1Api()
 
-    namespace = "jsh"
+    namespace = "common"
     access_mode = "ReadOnlyMany"
 
     create_persistent_volume()
