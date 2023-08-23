@@ -3,9 +3,9 @@ import argparse
 from kubernetes import client, config
 
 
-def create_master(node, port, gpu):
-    global host_addr
-    ip = f"{network_addr}.{host_addr}"
+def create_master(node, port, gpu, slot):
+    # global host_addr
+    # ip = f"{network_addr}.{host_addr}"
     pod_manifest = {
         "apiVersion": "v1",
         "kind": "Pod",
@@ -20,7 +20,7 @@ def create_master(node, port, gpu):
             "containers": [
                 {
                     "name": "app",
-                    "image": f"{args.image_name}-master-{args.version}",
+                    "image": f"{args.image_name}-{args.version}",
                     "env": [{"name": "NCCL_SOCKET_IFNAME", "value": f"ib{port-1040}"}],
                     # "imagePullPolicy": "Always",
                     "volumeMounts": [{"name": "pretrained-models", "mountPath": "/root/pretrained-models"}],
@@ -29,10 +29,11 @@ def create_master(node, port, gpu):
                         "-c",
                         f"/usr/sbin/sshd -p {port} && sleep infinity",
                     ],
-                    "ports": [{"containerPort": port, "hostIP": ip, "hostPort": port}],
+                    # "ports": [{"containerPort": port, "hostIP": ip, "hostPort": port}],
+                    "ports": [{"containerPort": port}],
                     "resources": {
                         "limits": {
-                            gpu: "1",
+                            gpu: str(slot),
                         }
                     },
                 },
@@ -45,9 +46,10 @@ def create_master(node, port, gpu):
     host_addr += 1
 
 
-def create_worker(node, port, gpu):
-    global worker_num, host_addr
-    ip = f"{network_addr}.{host_addr}"
+def create_worker(node, port, gpu, slot):
+    global worker_num
+    # global worker_num, host_addr
+    # ip = f"{network_addr}.{host_addr}"
     pod_manifest = {
         "apiVersion": "v1",
         "kind": "Pod",
@@ -62,7 +64,7 @@ def create_worker(node, port, gpu):
             "containers": [
                 {
                     "name": "app",
-                    "image": f"{args.image_name}-worker-{args.version}",
+                    "image": f"{args.image_name}-{args.version}",
                     "env": [{"name": "NCCL_SOCKET_IFNAME", "value": f"ib{port-1040}"}],
                     # "imagePullPolicy": "Always",
                     "volumeMounts": [{"name": "pretrained-models", "mountPath": "/root/pretrained-models"}],
@@ -71,10 +73,11 @@ def create_worker(node, port, gpu):
                         "-c",
                         f"/usr/sbin/sshd -p {port} && sleep infinity",
                     ],
-                    "ports": [{"containerPort": port, "hostIP": ip, "hostPort": port}],
+                    # "ports": [{"containerPort": port, "hostIP": ip, "hostPort": port}],
+                    "ports": [{"containerPort": port}],
                     "resources": {
                         "limits": {
-                            gpu: "1",
+                            gpu: str(slot),
                         }
                     },
                 },
@@ -94,7 +97,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--slot_size", type=int, required=True)
     parser.add_argument("-t", "--total_node", type=int, required=True)
     parser.add_argument("-v", "--version", type=str, required=True)
-    parser.add_argument("-ma", "--master_addr", type=str, required=True)
+    # parser.add_argument("-ma", "--master_addr", type=str, required=True)
     parser.add_argument("-mn", "--master_node_num", type=int, required=True)
     parser.add_argument("-gm", "--gpu_master", type=str, required=True)
     parser.add_argument("-gw", "--gpu_worker", type=str, required=True)
@@ -105,16 +108,17 @@ if __name__ == "__main__":
 
     namespace = "common"
     worker_num = 1
-    addr = args.master_addr
-    network_addr = addr[: addr.rfind(".")]
-    host_addr = int(addr.split(".")[-1])
+    # addr = args.master_addr
+    # network_addr = addr[: addr.rfind(".")]
+    # host_addr = int(addr.split(".")[-1])
 
-    node = f"k8s-node-{args.master_node_num}"
-    create_master(node, 1041, args.gpu_master)
-    for i in range(1, args.slot_size):
-        create_worker(node, 1041 + i, args.gpu_master)
+    node = f"gnode{args.master_node_num}"
+    create_master(node, 1041, args.gpu_master, args.slot_size)
+    # for i in range(1, args.slot_size):
+    #     create_worker(node, 1041 + i, args.gpu_master)
 
     for i in range(1, args.total_node):
-        node = f"k8s-node-{args.master_node_num + i}"
-        for i in range(0, args.slot_size):
-            create_worker(node, 1041 + i, args.gpu_worker)
+        node_num = str(args.master_node_num + i).zfill(3)
+        node = f"gnode{node_num}"
+        # for i in range(0, args.slot_size):
+        create_worker(node, 1041, args.gpu_worker, args.slot_size)
