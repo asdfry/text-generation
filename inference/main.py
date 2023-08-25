@@ -72,7 +72,7 @@ def generate_text(item: Infer):
         outputs = model["model"].generate(inputs, max_new_tokens=item["max_token"], top_k=50)
 
     elif item["top_p"]:
-        outputs = model["model"].generate(inputs, max_new_tokens=item["max_token"], top_k=0.95)
+        outputs = model["model"].generate(inputs, max_new_tokens=item["max_token"], top_p=0.95)
 
     sentences = model["tokenizer"].batch_decode(outputs, skip_special_tokens=True)
 
