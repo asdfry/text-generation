@@ -65,14 +65,18 @@ def generate_text(item: Infer):
     sentences = item["sentences"]
     inputs = model["tokenizer"](sentences, return_tensors="pt").input_ids.cuda()
 
-    if item["greedy"]:
-        outputs = model["model"].generate(inputs, max_new_tokens=item["max_token"], do_sample=False, num_beams=1)
-
-    elif item["top_k"]:
-        outputs = model["model"].generate(inputs, max_new_tokens=item["max_token"], top_k=50)
-
-    elif item["top_p"]:
-        outputs = model["model"].generate(inputs, max_new_tokens=item["max_token"], top_p=0.95)
+    outputs = model["model"].generate(
+        inputs,
+        do_sample=True,
+        top_k=50,
+        top_p=0.92,
+        # min_length=10,
+        # max_length=50,
+        temperature=0.9,
+        repetition_penalty=1.5,
+        no_repeat_ngram_size=3,
+        max_new_tokens=item["max_token"],
+    )
 
     sentences = model["tokenizer"].batch_decode(outputs, skip_special_tokens=True)
 

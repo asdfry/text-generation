@@ -8,11 +8,13 @@ class Model(BaseModel):
 
 
 class Infer(BaseModel):
+    top_k: Annotated[int, "Top-k"] = 50
+    top_p: Annotated[float, "Top-p"] = 0.92
     sentences: Annotated[List[str], "List of sentences to inference"]
     max_token: Annotated[int, "Numbers of max new tokens"]
-    greedy: Annotated[bool, "Whether to use greedy search"] = False
-    top_k: Annotated[bool, "Whether to use top_k"] = False
-    top_p: Annotated[bool, "Whether to use top_p"] = False
+    temperature: Annotated[float, "Temperature"] = 0.9
+    repetition_penalty: Annotated[float, "Repetition penalty"] = 1.5
+    no_repeat_ngram_size: Annotated[int, "No repeat ngram size"] =3
 
 
 class Result(BaseModel):
