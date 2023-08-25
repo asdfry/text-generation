@@ -10,6 +10,7 @@ logger.add("logs/log_{time}.log")
 model_names = sorted(glob("/gpfs/user/jsh/*"))
 model_names = [i.split("/")[-1] for i in model_names]
 model_names.remove("LLaMA-2-7B-32K")
+model_names.remove("Llama-2-70b-chat-hf")
 
 for model_name in model_names:
     logger.info(f"Model: {model_name}")
