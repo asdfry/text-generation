@@ -3,10 +3,10 @@ version: "3.6"
 services:
 
   master:
-    image: asdfry/text-generation:horovod-master-${version}
+    image: asdfry/text-generation:horovod-${version}
     build:
       context: .
-      dockerfile: Dockerfile.master
+      dockerfile: Dockerfile
     command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
     volumes:
       - ./logs:/root/logs:rw
@@ -23,27 +23,27 @@ services:
             device_ids: ['0', '1']
             capabilities: [gpu]
 
-  worker-1:
-    image: asdfry/text-generation:horovod-worker-${version}
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
-    command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
-    volumes:
-      - ./pretrained-models:/root/pretrained-models:ro
-    deploy:
-      resources:
-        reservations:
-          devices:
-          - driver: nvidia
-            device_ids: ['2', '3']
-            capabilities: [gpu]
-
-  # worker-2:
-  #   image: asdfry/text-generation:horovod-worker-${version}
+  # worker-1:
+  #   image: asdfry/text-generation:horovod-${version}
   #   build:
   #     context: .
-  #     dockerfile: Dockerfile.worker
+  #     dockerfile: Dockerfile
+  #   command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
+  #   volumes:
+  #     - ./pretrained-models:/root/pretrained-models:ro
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #         - driver: nvidia
+  #           device_ids: ['2', '3']
+  #           capabilities: [gpu]
+
+  # worker-2:
+  #   image: asdfry/text-generation:horovod-${version}
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
   #   command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
   #   volumes:
   #     - ./pretrained-models:/root/pretrained-models:ro
@@ -56,10 +56,10 @@ services:
   #           capabilities: [gpu]
 
   # worker-3:
-  #   image: asdfry/text-generation:horovod-worker-${version}
+  #   image: asdfry/text-generation:horovod-${version}
   #   build:
   #     context: .
-  #     dockerfile: Dockerfile.worker
+  #     dockerfile: Dockerfile
   #   command: ["/bin/bash", "-c", "/usr/sbin/sshd && sleep infinity"]
   #   volumes:
   #     - ./pretrained-models:/root/pretrained-models:ro
