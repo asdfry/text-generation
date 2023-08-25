@@ -1,0 +1,7 @@
+--extra-index-url https://download.pytorch.org/whl/cu118
+torch==2.0.1
+git+https://github.com/huggingface/transformers
+sentencepiece==0.1.99
+protobuf==4.24.0
+fastapi==0.101.1
+uvicorn==0.23.2
