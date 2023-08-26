@@ -93,14 +93,13 @@ def generate_text(item: Infer):
     outputs = model["model"].generate(
         inputs,
         do_sample=True,
-        top_k=50,
-        top_p=0.92,
-        # min_length=10,
-        # max_length=50,
-        temperature=0.9,
-        repetition_penalty=1.5,
-        no_repeat_ngram_size=3,
-        max_new_tokens=item["max_token"],
+        top_k=item["top_k"],
+        top_p=item["top_p"],
+        min_length=item["min_length"],
+        max_length=item["max_length"],
+        temperature=item["temperature"],
+        repetition_penalty=item["repetition_penalty"],
+        no_repeat_ngram_size=item["no_repeat_ngram_size"],
     )
 
     sentences = model["tokenizer"].batch_decode(outputs, skip_special_tokens=True)
@@ -123,14 +122,13 @@ def generate_text_large(item: Infer):
     outputs = model["model"].generate(
         inputs,
         do_sample=True,
-        top_k=50,
-        top_p=0.92,
-        # min_length=10,
-        # max_length=50,
-        temperature=0.9,
-        repetition_penalty=1.5,
-        no_repeat_ngram_size=3,
-        max_new_tokens=item["max_token"],
+        top_k=item["top_k"],
+        top_p=item["top_p"],
+        min_length=item["min_length"],
+        max_length=item["max_length"],
+        temperature=item["temperature"],
+        repetition_penalty=item["repetition_penalty"],
+        no_repeat_ngram_size=item["no_repeat_ngram_size"],
     )
 
     sentences = model["tokenizer"].batch_decode(outputs, skip_special_tokens=True)

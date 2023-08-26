@@ -11,7 +11,8 @@ class Infer(BaseModel):
     top_k: Annotated[int, "Top-k"] = 50
     top_p: Annotated[float, "Top-p"] = 0.92
     sentences: Annotated[List[str], "Sentences to inference"]
-    max_token: Annotated[int, "Max new tokens"]
+    min_length: Annotated[int, "Minimum length of the sequence to be generated"] = 10
+    max_length: Annotated[int, "Maximum length of the sequence to be generated"] = 100
     temperature: Annotated[float, "Temperature"] = 0.9
     repetition_penalty: Annotated[float, "Repetition penalty"] = 1.5
     no_repeat_ngram_size: Annotated[int, "No repeat ngram size"] =3
