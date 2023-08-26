@@ -49,7 +49,11 @@ for model_name in model_names:
     rs = (grequests.post(url, json={"name": model_name}, headers=headers) for url in urls)
     results = [i.json() for i in grequests.map(rs)]
     ets = [i["elapsed_time"] for i in results]
-    logger.info(f"[Unload] elapsed time: {round(sum(ets)/len(ets), 2)} sec")
+    ums = [i["used_memory"] for i in results]
+    logger.info(
+        f"[Unload] elapsed time: {round(sum(ets)/len(ets), 2)} sec, "
+        f"used memory: {round(sum(ums)/len(ums), 2)} GiB"
+    )
 
 large_model_names = sorted(glob("/gpfs/user/jsh/infer-large/*"))
 large_model_names = [i.split("/")[-1] for i in large_model_names]
@@ -86,7 +90,10 @@ for large_model_name in large_model_names:
     )
 
     # Model down
-    url = "http://127.0.0.1:1040/unload-model"
+    url = "http://127.0.0.1:1040/unload-model-large"
     rs = requests.post(url, json={"name": large_model_name}, headers=headers)
     result = rs.json()
-    logger.info(f"[Unload] elapsed time: {round(result['elapsed_time'], 2)} sec, ")
+    logger.info(
+        f"[Unload] elapsed time: {round(result['elapsed_time'], 2)} sec, "
+        f"used memory: {round(result['used_memory'], 2)} GiB"
+    )

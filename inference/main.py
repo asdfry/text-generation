@@ -1,3 +1,4 @@
+import gc
 import time
 import torch
 import logging
@@ -8,7 +9,7 @@ from fastapi import FastAPI, HTTPException
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 
-model = {}
+share = {"last_mem": 0.0}
 logger = logging.getLogger("uvicorn")
 
 app = FastAPI()
@@ -24,9 +25,9 @@ def up_model(item: Model):
         model_path = f"pretrained-models/{model_name}"
         logger.info(f"Load Model ({item}) . . .")
 
-        model["tokenizer"] = AutoTokenizer.from_pretrained(model_path)
-        model["model"] = AutoModelForCausalLM.from_pretrained(model_path, trust_remote_code=True).cuda()
-        used_memory = torch.cuda.memory_reserved() / 1024**3
+        share["tokenizer"] = AutoTokenizer.from_pretrained(model_path)
+        share["model"] = AutoModelForCausalLM.from_pretrained(model_path, trust_remote_code=True).cuda()
+        used_memory = torch.cuda.memory_reserved() / 1024**3 - share["last_mem"]
 
         return Result(elapsed_time=time.time() - begin_time, used_memory=used_memory)
 
@@ -44,14 +45,14 @@ def up_model_large(item: Model):
         model_path = f"pretrained-models/{model_name}"
         logger.info(f"Load Model ({item}) . . .")
 
-        model["tokenizer"] = AutoTokenizer.from_pretrained(model_path)
-        model["model"] = AutoModelForCausalLM.from_pretrained(
+        share["tokenizer"] = AutoTokenizer.from_pretrained(model_path)
+        share["model"] = AutoModelForCausalLM.from_pretrained(
             model_path,
             device_map="auto",
             torch_dtype=torch.float16,
             trust_remote_code=True,
         )
-        used_memory = sum([torch.cuda.memory_reserved(i) / 1024**3 for i in range(8)])
+        used_memory = sum([torch.cuda.memory_reserved(i) / 1024**3 for i in range(8)]) - share["last_mem"]
 
         return Result(elapsed_time=time.time() - begin_time, used_memory=used_memory)
 
@@ -65,15 +66,41 @@ def down_model(item: Model):
     item = item.model_dump()
     model_name = item["name"]
 
-    if not "model" in model:
+    if not "model" in share:
         raise HTTPException(status_code=404, detail="Model not loaded")
 
     elif check_model(model_name):
         logger.info(f"Unload Model ({item}) . . .")
 
-        model.clear()
+        share.clear()
         torch.cuda.empty_cache()
         used_memory = torch.cuda.memory_reserved() / 1024**3
+        share["last_mem"] = used_memory
+
+        return Result(elapsed_time=time.time() - begin_time, used_memory=used_memory)
+
+    else:
+        raise HTTPException(status_code=422, detail="Invalid model name")
+
+
+@app.post("/unload-model-large", status_code=200)
+def down_model(item: Model):
+    begin_time = time.time()
+    item = item.model_dump()
+    model_name = item["name"]
+
+    if not "model" in share:
+        raise HTTPException(status_code=404, detail="Model not loaded")
+
+    elif check_model(model_name):
+        logger.info(f"Unload Model ({item}) . . .")
+
+        share["model"].cpu()
+        share.clear()
+        gc.collect()
+        torch.cuda.empty_cache()
+        used_memory = sum([torch.cuda.memory_reserved(i) / 1024**3 for i in range(8)]) / 1024**3
+        share["last_mem"] = used_memory
 
         return Result(elapsed_time=time.time() - begin_time, used_memory=used_memory)
 
@@ -88,9 +115,9 @@ def generate_text(item: Infer):
     logger.info(f"Generate Text ({item}) . . .")
 
     sentences = item["sentences"]
-    inputs = model["tokenizer"](sentences, return_tensors="pt").input_ids.cuda()
+    inputs = share["tokenizer"](sentences, return_tensors="pt").input_ids.cuda()
 
-    outputs = model["model"].generate(
+    outputs = share["model"].generate(
         inputs,
         do_sample=True,
         top_k=item["top_k"],
@@ -102,9 +129,9 @@ def generate_text(item: Infer):
         no_repeat_ngram_size=item["no_repeat_ngram_size"],
     )
 
-    sentences = model["tokenizer"].batch_decode(outputs, skip_special_tokens=True)
+    sentences = share["tokenizer"].batch_decode(outputs, skip_special_tokens=True)
 
-    used_memory = torch.cuda.memory_reserved() / 1024**3
+    used_memory = torch.cuda.memory_reserved() / 1024**3 - share["last_mem"]
     torch.cuda.empty_cache()
 
     return Result(elapsed_time=time.time() - begin_time, used_memory=used_memory)
@@ -117,9 +144,9 @@ def generate_text_large(item: Infer):
     logger.info(f"Generate Text ({item}) . . .")
 
     sentences = item["sentences"]
-    inputs = model["tokenizer"](sentences, return_tensors="pt").input_ids.cuda(7)
+    inputs = share["tokenizer"](sentences, return_tensors="pt").input_ids.cuda(7)
 
-    outputs = model["model"].generate(
+    outputs = share["model"].generate(
         inputs,
         do_sample=True,
         top_k=item["top_k"],
@@ -131,9 +158,9 @@ def generate_text_large(item: Infer):
         no_repeat_ngram_size=item["no_repeat_ngram_size"],
     )
 
-    sentences = model["tokenizer"].batch_decode(outputs, skip_special_tokens=True)
+    sentences = share["tokenizer"].batch_decode(outputs, skip_special_tokens=True)
 
-    used_memory = sum([torch.cuda.memory_reserved(i) / 1024**3 for i in range(8)])
+    used_memory = sum([torch.cuda.memory_reserved(i) / 1024**3 for i in range(8)]) - share["last_mem"]
     torch.cuda.empty_cache()
 
     return Result(elapsed_time=time.time() - begin_time, used_memory=used_memory)
