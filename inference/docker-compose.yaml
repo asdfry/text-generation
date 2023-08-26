@@ -9,7 +9,7 @@ services:
       dockerfile: Dockerfile
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
     volumes:
-      - /gpfs/user/jsh:/root/pretrained-models:ro
+      - /gpfs/user/jsh/infer-large:/root/pretrained-models:ro
     ports:
       - 1040:8000
     deploy:
@@ -27,7 +27,7 @@ services:
       dockerfile: Dockerfile
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
     volumes:
-      - /gpfs/user/jsh:/root/pretrained-models:ro
+      - /gpfs/user/jsh/infer:/root/pretrained-models:ro
     ports:
       - 1041:8000
     deploy:
@@ -45,7 +45,7 @@ services:
       dockerfile: Dockerfile
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
     volumes:
-      - /gpfs/user/jsh:/root/pretrained-models:ro
+      - /gpfs/user/jsh/infer:/root/pretrained-models:ro
     ports:
       - 1042:8000
     deploy:
@@ -63,7 +63,7 @@ services:
       dockerfile: Dockerfile
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
     volumes:
-      - /gpfs/user/jsh:/root/pretrained-models:ro
+      - /gpfs/user/jsh/infer:/root/pretrained-models:ro
     ports:
       - 1043:8000
     deploy:
@@ -81,7 +81,7 @@ services:
       dockerfile: Dockerfile
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
     volumes:
-      - /gpfs/user/jsh:/root/pretrained-models:ro
+      - /gpfs/user/jsh/infer:/root/pretrained-models:ro
     ports:
       - 1044:8000
     deploy:
@@ -99,7 +99,7 @@ services:
       dockerfile: Dockerfile
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
     volumes:
-      - /gpfs/user/jsh:/root/pretrained-models:ro
+      - /gpfs/user/jsh/infer:/root/pretrained-models:ro
     ports:
       - 1045:8000
     deploy:
@@ -117,7 +117,7 @@ services:
       dockerfile: Dockerfile
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
     volumes:
-      - /gpfs/user/jsh:/root/pretrained-models:ro
+      - /gpfs/user/jsh/infer:/root/pretrained-models:ro
     ports:
       - 1046:8000
     deploy:
@@ -135,7 +135,7 @@ services:
       dockerfile: Dockerfile
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
     volumes:
-      - /gpfs/user/jsh:/root/pretrained-models:ro
+      - /gpfs/user/jsh/infer:/root/pretrained-models:ro
     ports:
       - 1047:8000
     deploy:
@@ -153,7 +153,7 @@ services:
       dockerfile: Dockerfile
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
     volumes:
-      - /gpfs/user/jsh:/root/pretrained-models:ro
+      - /gpfs/user/jsh/infer:/root/pretrained-models:ro
     ports:
       - 1048:8000
     deploy:
