@@ -96,9 +96,11 @@ def create_worker(node, port, gpu, slot, model_dir_path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--image_name", type=str, required=True)
+    parser.add_argument("-n", "--node_prefix", type=str, required=True)
     parser.add_argument("-s", "--slot_size", type=int, required=True)
     parser.add_argument("-t", "--total_node", type=int, required=True)
     parser.add_argument("-v", "--version", type=str, required=True)
+    parser.add_argument("-z", "--zero_fill", type=int, required=True)
     # parser.add_argument("-ma", "--master_addr", type=str, required=True)
     parser.add_argument("-mn", "--master_node_num", type=int, required=True)
     parser.add_argument("-mp", "--model_dir_path", type=str, required=True)
@@ -115,14 +117,14 @@ if __name__ == "__main__":
     # network_addr = addr[: addr.rfind(".")]
     # host_addr = int(addr.split(".")[-1])
 
-    node_num = str(args.master_node_num).zfill(3)
-    node = f"gnode{node_num}"
+    node_num = str(args.master_node_num).zfill(args.zero_fill)
+    node = f"{args.node_prefix}{node_num}"
     create_master(node, 1041, args.gpu_master, args.slot_size, args.model_dir_path)
     # for i in range(1, args.slot_size):
     #     create_worker(node, 1041 + i, args.gpu_master)
 
     for i in range(1, args.total_node):
-        node_num = str(args.master_node_num + i).zfill(3)
-        node = f"gnode{node_num}"
+        node_num = str(args.master_node_num + i).zfill(args.zero_fill)
+        node = f"{args.node_prefix}{node_num}"
         # for i in range(0, args.slot_size):
         create_worker(node, 1041, args.gpu_worker, args.slot_size, args.model_dir_path)

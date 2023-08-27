@@ -1,2 +1,23 @@
-python deploy.py -i asdfry/text-generation:accelerate -s 2 -t 2 -v 20230815 -ma 192.168.12.1 -mn 2 -gm ten1010.io/gpu-nvidia-a100-pcie-40gb -gw ten1010.io/gpu-tesla-t4
-python deploy.py -i asdfry/text-generation:horovod -s 2 -t 2 -v 20230815 -ma 192.168.12.1 -mn 2 -gm ten1010.io/gpu-nvidia-a100-pcie-40gb -gw ten1010.io/gpu-tesla-t4
+python deploy.py \
+-i asdfry/text-generation:accelerate \
+-n "k8s-node-" \
+-s 1 \
+-t 2 \
+-v 20230827 \
+-z 1 \
+-mn 2 \
+-mp /gpfs/user/jsh/train \
+-gm ten1010.io/gpu-nvidia-a100-pcie-40gb \
+-gw ten1010.io/gpu-tesla-t4
+
+python deploy.py \
+-i asdfry/text-generation:horovod \
+-n "k8s-node-" \
+-s 1 \
+-t 2 \
+-v 20230827 \
+-z 1 \
+-mn 2 \
+-mp /gpfs/user/jsh/train \
+-gm ten1010.io/gpu-nvidia-a100-pcie-40gb \
+-gw ten1010.io/gpu-tesla-t4

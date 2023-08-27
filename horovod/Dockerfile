@@ -20,7 +20,7 @@ ENV HF_DATASETS_OFFLINE=1
 
 # Set locale and Install packages
 RUN apt-get update && \
-    apt-get install -y iputils-ping vim openssh-server git iftop && \
+    apt-get install -y iputils-ping vim openssh-server git collectl && \
     mkdir -p /var/run/sshd
 
 # Set for ssh

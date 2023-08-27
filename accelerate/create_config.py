@@ -2,40 +2,40 @@ import os
 import argparse
 
 
-def write_master_config(network_addr: str, port: int):
+def write_master_config(network_addr: str, slot_size: int):
     global host_addr
     hostname = f"{network_addr}.{host_addr}"
     with open(".ssh/config", "a") as f:
         f.write(f"Host master\n")
         f.write(f"    HostName {hostname}\n")
-        f.write(f"    Port {port}\n")
+        f.write(f"    Port 1041\n")
         f.write(f"    User root\n")
         f.write(f"    IdentityFile /root/.ssh/key.pem\n")
         f.write(f"    StrictHostKeyChecking no\n\n")
     with open("hostfile", "a") as f:
-        f.write(f"master slots=1\n")
-    print(f"NODE (name: master, addr: {hostname}, port: {port})")
+        f.write(f"master slots={slot_size}\n")
+    print(f"NODE (name: master, addr: {hostname}, slot: {slot_size})")
     host_addr += 1
 
 
-def write_worker_config(network_addr: str, port: int):
+def write_worker_config(network_addr: str, slot_size: int):
     global worker_num, host_addr
     hostname = f"{network_addr}.{host_addr}"
     with open(".ssh/config", "a") as f:
         f.write(f"Host worker-{worker_num}\n")
         f.write(f"    HostName {hostname}\n")
-        f.write(f"    Port {port}\n")
+        f.write(f"    Port 1041\n")
         f.write(f"    User root\n")
         f.write(f"    IdentityFile /root/.ssh/key.pem\n")
         f.write(f"    StrictHostKeyChecking no\n\n")
     with open("hostfile", "a") as f:
-        f.write(f"worker-{worker_num} slots=1\n")
-    print(f"NODE (name: worker-{worker_num}, addr: {hostname}, port: {port})")
+        f.write(f"worker-{worker_num} slots={slot_size}\n")
+    print(f"NODE (name: worker-{worker_num}, addr: {hostname}, slot: {slot_size})")
     host_addr += 1
     worker_num += 1
 
 
-def write_accelerate_config(master_addr: str, worker_num: int):
+def write_accelerate_config(master_addr: str, node_num: int, worker_num: int):
     os.makedirs(".cache/huggingface/accelerate", exist_ok=True)
     with open(".cache/huggingface/accelerate/default_config.yaml", "w+") as f:
         f.write(
@@ -53,7 +53,7 @@ def write_accelerate_config(master_addr: str, worker_num: int):
             f"main_process_port: 1040\n"
             f"main_training_function: main\n"
             f"mixed_precision: 'no'\n"
-            f"num_machines: {worker_num}\n"
+            f"num_machines: {node_num}\n"
             f"num_processes: {worker_num}\n"
             f"rdzv_backend: static\n"
             f"same_network: true\n"
@@ -76,12 +76,9 @@ if __name__ == "__main__":
     network_addr = addr[: addr.rfind(".")]
     host_addr = int(addr.split(".")[-1])
 
-    write_master_config(network_addr, 1041)
-    for i in range(1, args.slot_size):
-        write_worker_config(network_addr, 1041 + i)
+    write_master_config(network_addr, args.slot_size)
 
     for _ in range(1, args.total_node):
-        for i in range(0, args.slot_size):
-            write_worker_config(network_addr, 1041 + i)
+        write_worker_config(network_addr, args.slot_size)
 
-    write_accelerate_config(addr, worker_num)
+    write_accelerate_config(addr, args.total_node, worker_num)
