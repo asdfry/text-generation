@@ -4,8 +4,6 @@ from kubernetes import client, config
 
 
 def create_master(node, port, gpu, slot, model_dir_path):
-    # global host_addr
-    # ip = f"{network_addr}.{host_addr}"
     pod_manifest = {
         "apiVersion": "v1",
         "kind": "Pod",
@@ -23,7 +21,12 @@ def create_master(node, port, gpu, slot, model_dir_path):
                     "image": f"{args.image_name}-{args.version}",
                     # "env": [{"name": "NCCL_SOCKET_IFNAME", "value": f"ib{port-1040}"}],
                     # "imagePullPolicy": "Always",
-                    "volumeMounts": [{"name": "pretrained-models", "mountPath": "/root/pretrained-models"}],
+                    "volumeMounts": [
+                        {
+                            "name": "pretrained-models",
+                            "mountPath": "/root/pretrained-models",
+                        }
+                    ],
                     "command": [
                         "/bin/bash",
                         "-c",
@@ -39,18 +42,20 @@ def create_master(node, port, gpu, slot, model_dir_path):
                 },
             ],
             # "volumes": [{"name": "pretrained-models", "persistentVolumeClaim": {"claimName": "jsh-pvc"}}],
-            "volumes": [{"name": "pretrained-models", "hostPath": {"path": f"{model_dir_path}", "type": "Directory"}}],
+            "volumes": [
+                {
+                    "name": "pretrained-models",
+                    "hostPath": {"path": f"{model_dir_path}", "type": "Directory"},
+                }
+            ],
         },
     }
     v1.create_namespaced_pod(namespace, pod_manifest)
     print(f"POD (name: {pod_manifest['metadata']['name']}, node: {node}, port: {port})")
-    # host_addr += 1
 
 
 def create_worker(node, port, gpu, slot, model_dir_path):
     global worker_num
-    # global worker_num, host_addr
-    # ip = f"{network_addr}.{host_addr}"
     pod_manifest = {
         "apiVersion": "v1",
         "kind": "Pod",
@@ -68,7 +73,12 @@ def create_worker(node, port, gpu, slot, model_dir_path):
                     "image": f"{args.image_name}-{args.version}",
                     # "env": [{"name": "NCCL_SOCKET_IFNAME", "value": f"ib{port-1040}"}],
                     # "imagePullPolicy": "Always",
-                    "volumeMounts": [{"name": "pretrained-models", "mountPath": "/root/pretrained-models"}],
+                    "volumeMounts": [
+                        {
+                            "name": "pretrained-models",
+                            "mountPath": "/root/pretrained-models",
+                        }
+                    ],
                     "command": [
                         "/bin/bash",
                         "-c",
@@ -84,12 +94,16 @@ def create_worker(node, port, gpu, slot, model_dir_path):
                 },
             ],
             # "volumes": [{"name": "pretrained-models", "persistentVolumeClaim": {"claimName": "jsh-pvc"}}],
-            "volumes": [{"name": "pretrained-models", "hostPath": {"path": f"{model_dir_path}", "type": "Directory"}}],
+            "volumes": [
+                {
+                    "name": "pretrained-models",
+                    "hostPath": {"path": f"{model_dir_path}", "type": "Directory"},
+                }
+            ],
         },
     }
     v1.create_namespaced_pod(namespace, pod_manifest)
     print(f"POD (name: {pod_manifest['metadata']['name']}, node: {node}, port: {port})")
-    # host_addr += 1
     worker_num += 1
 
 
@@ -113,18 +127,12 @@ if __name__ == "__main__":
 
     namespace = "common"
     worker_num = 1
-    # addr = args.master_addr
-    # network_addr = addr[: addr.rfind(".")]
-    # host_addr = int(addr.split(".")[-1])
 
     node_num = str(args.master_node_num).zfill(args.zero_fill)
     node = f"{args.node_prefix}{node_num}"
     create_master(node, 1041, args.gpu_master, args.slot_size, args.model_dir_path)
-    # for i in range(1, args.slot_size):
-    #     create_worker(node, 1041 + i, args.gpu_master)
 
     for i in range(1, args.total_node):
         node_num = str(args.master_node_num + i).zfill(args.zero_fill)
         node = f"{args.node_prefix}{node_num}"
-        # for i in range(0, args.slot_size):
         create_worker(node, 1041, args.gpu_worker, args.slot_size, args.model_dir_path)
