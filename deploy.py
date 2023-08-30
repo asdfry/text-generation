@@ -19,13 +19,10 @@ def create_master(node, port, gpu, slot, model_dir_path):
                 {
                     "name": "app",
                     "image": f"{args.image_name}-{args.version}",
-                    # "env": [{"name": "NCCL_SOCKET_IFNAME", "value": f"ib{port-1040}"}],
                     # "imagePullPolicy": "Always",
                     "volumeMounts": [
-                        {
-                            "name": "pretrained-models",
-                            "mountPath": "/root/pretrained-models",
-                        }
+                        {"name": "pretrained-models", "mountPath": "/root/pretrained-models"},
+                        {"name": "shmdir", "mountPath": "/dev/shm"},
                     ],
                     "command": [
                         "/bin/bash",
@@ -39,14 +36,16 @@ def create_master(node, port, gpu, slot, model_dir_path):
                             gpu: str(slot),
                         }
                     },
+                    "securityContext": {"privileged": True},
                 },
             ],
-            # "volumes": [{"name": "pretrained-models", "persistentVolumeClaim": {"claimName": "jsh-pvc"}}],
+            # "volumes": [
+            #     {"name": "pretrained-models", "persistentVolumeClaim": {"claimName": "jsh-pvc"}},
+            #     {"name": "shmdir", "emptyDir": {"medium": "Memory", "sizeLimit": "256M"}},
+            # ],
             "volumes": [
-                {
-                    "name": "pretrained-models",
-                    "hostPath": {"path": f"{model_dir_path}", "type": "Directory"},
-                }
+                {"name": "pretrained-models", "hostPath": {"path": f"{model_dir_path}", "type": "Directory"}},
+                {"name": "shmdir", "emptyDir": {"medium": "Memory", "sizeLimit": "256M"}},
             ],
         },
     }
@@ -71,13 +70,10 @@ def create_worker(node, port, gpu, slot, model_dir_path):
                 {
                     "name": "app",
                     "image": f"{args.image_name}-{args.version}",
-                    # "env": [{"name": "NCCL_SOCKET_IFNAME", "value": f"ib{port-1040}"}],
                     # "imagePullPolicy": "Always",
                     "volumeMounts": [
-                        {
-                            "name": "pretrained-models",
-                            "mountPath": "/root/pretrained-models",
-                        }
+                        {"name": "pretrained-models", "mountPath": "/root/pretrained-models"},
+                        {"name": "shmdir", "mountPath": "/dev/shm"},
                     ],
                     "command": [
                         "/bin/bash",
@@ -91,14 +87,16 @@ def create_worker(node, port, gpu, slot, model_dir_path):
                             gpu: str(slot),
                         }
                     },
+                    "securityContext": {"privileged": True},
                 },
             ],
-            # "volumes": [{"name": "pretrained-models", "persistentVolumeClaim": {"claimName": "jsh-pvc"}}],
+            # "volumes": [
+            #     {"name": "pretrained-models", "persistentVolumeClaim": {"claimName": "jsh-pvc"}},
+            #     {"name": "shmdir", "emptyDir": {"medium": "Memory", "sizeLimit": "256M"}},
+            # ],
             "volumes": [
-                {
-                    "name": "pretrained-models",
-                    "hostPath": {"path": f"{model_dir_path}", "type": "Directory"},
-                }
+                {"name": "pretrained-models", "hostPath": {"path": f"{model_dir_path}", "type": "Directory"}},
+                {"name": "shmdir", "emptyDir": {"medium": "Memory", "sizeLimit": "256M"}},
             ],
         },
     }
@@ -115,7 +113,6 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--total_node", type=int, required=True)
     parser.add_argument("-v", "--version", type=str, required=True)
     parser.add_argument("-z", "--zero_fill", type=int, required=True)
-    # parser.add_argument("-ma", "--master_addr", type=str, required=True)
     parser.add_argument("-mn", "--master_node_num", type=int, required=True)
     parser.add_argument("-mp", "--model_dir_path", type=str, required=True)
     parser.add_argument("-gm", "--gpu_master", type=str, required=True)

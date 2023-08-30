@@ -35,7 +35,7 @@ def write_worker_config(network_addr: str, slot_size: int):
     worker_num += 1
 
 
-def write_accelerate_config(master_addr: str, node_num: int, worker_num: int):
+def write_accelerate_config(master_addr: str, slot_size: int, total_node: int):
     os.makedirs(".cache/huggingface/accelerate", exist_ok=True)
     with open(".cache/huggingface/accelerate/default_config.yaml", "w+") as f:
         f.write(
@@ -53,8 +53,8 @@ def write_accelerate_config(master_addr: str, node_num: int, worker_num: int):
             f"main_process_port: 1040\n"
             f"main_training_function: main\n"
             f"mixed_precision: 'no'\n"
-            f"num_machines: {node_num}\n"
-            f"num_processes: {worker_num}\n"
+            f"num_machines: {total_node}\n"
+            f"num_processes: {slot_size * total_node}\n"
             f"rdzv_backend: static\n"
             f"same_network: true\n"
             f"tpu_env: []\n"
@@ -81,4 +81,4 @@ if __name__ == "__main__":
     for _ in range(1, args.total_node):
         write_worker_config(network_addr, args.slot_size)
 
-    write_accelerate_config(addr, args.total_node, worker_num)
+    write_accelerate_config(addr, args.slot_size, args.total_node)
