@@ -48,11 +48,11 @@ if accelerator.process_index == 0:
     logger.info(f"Model: {args.model_path}")
 
 
-# Run resource monitor
+# Start resource monitor
 rm = ResourceMonitor()
 rm.start()
 if accelerator.process_index == 0:
-    logger.info("Run resource monitor")
+    logger.info("Start resource monitor")
 
 
 # Create dataset
@@ -169,3 +169,9 @@ for epoch in range(args.epoch):
     if accelerator.process_index == 0:
         logger.info(f"[epoch {epoch+1}] mean perplexity: {metric['mean_perplexity']}")
         logger.info(f"[epoch {epoch+1}] elapsed time: {time.time() - start_time} sec")
+
+
+# Stop resource monitor
+rm.stop()
+if accelerator.process_index == 0:
+    logger.info("Stop resource monitor")

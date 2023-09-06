@@ -13,6 +13,7 @@ from threading import Thread
 class ResourceMonitor(Thread):
     def __init__(self) -> None:
         super().__init__()
+        self.stop_flag = False
         self.KST = timezone(timedelta(hours=9))
         self.paths = [i for i in glob("/sys/class/infiniband/mlx*") if re.search(r"mlx\d_\d+", i)]
         self.cnt_names = ["port_xmit_data", "port_xmit_packets", "port_rcv_data", "port_rcv_packets"]
@@ -26,7 +27,7 @@ class ResourceMonitor(Thread):
                     self.latest[hca][cnt_name] = cnt
 
     def run(self):
-        while True:
+        while not self.stop_flag:
             start_time = time.perf_counter()
 
             resource = {
@@ -62,3 +63,6 @@ class ResourceMonitor(Thread):
 
             with open(f"logs/resource.{socket.gethostname()}.jsonl", "a+") as f:
                 f.write(json.dumps(resource) + "\n")
+
+    def stop(self):
+        self.stop_flag = True
