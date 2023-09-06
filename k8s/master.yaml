@@ -25,17 +25,22 @@ spec:
     securityContext:
       privileged: true
     volumeMounts:
-    - mountPath: /root/pretrained-models
-      name: pretrained-models
-    - mountPath: /dev/shm
-      name: shmdir
+    - name: logs
+      mountPath: /root/logs
+    - name: pretrained-models
+      mountPath: /root/pretrained-models
+    - name: shmdir
+      mountPath: /dev/shm
   hostNetwork: true
   nodeSelector:
     kubernetes.io/hostname: k8s-node-2
   volumes:
+  - name: logs
+    persistentVolumeClaim:
+      claimName: jsh-logs-pvc
   - name: pretrained-models
     persistentVolumeClaim:
-      claimName: jsh-pvc
+      claimName: jsh-pretrained-models-pvc
   - name: shmdir
     emptyDir:
       medium: Memory

@@ -9,6 +9,7 @@ from datasets import load_from_disk
 from accelerate import Accelerator
 from torch.optim import SGD, AdamW
 from transformers import AutoTokenizer, AutoModelForCausalLM, Adafactor
+from resource_monitor import ResourceMonitor
 from torch.utils.data import DataLoader
 from accelerate.logging import get_logger
 
@@ -20,7 +21,7 @@ parser.add_argument("-e", "--epoch", type=int, required=True)
 parser.add_argument("-n", "--num_proc", type=int, default=2)
 parser.add_argument("-o", "--optimizer", type=str, choices=["sgd", "adafactor", "adamw"], default="adafactor")
 parser.add_argument("-t", "--test", action="store_true")
-parser.add_argument("-ml", "--max_length", type=int, choices=[128, 256, 512], default=128)
+parser.add_argument("-ml", "--max_length", type=int, choices=[32, 64, 128, 256, 512], default=128)
 parser.add_argument("-mp", "--model_path", type=str, default="LLaMA-2-7B-32K")
 args = parser.parse_args()
 
@@ -31,18 +32,25 @@ accelerator = Accelerator()
 
 # Set logger
 if accelerator.process_index == 0:
-    filename = datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
+    filename = datetime.today().strftime("torch.%Y-%m-%d_%H-%M-%S")
     logging.basicConfig(
         format="%(asctime)s\t%(levelname)s\t%(message)s",
         level=logging.INFO,
         handlers=[logging.FileHandler(f"logs/{filename}.log"), logging.StreamHandler()],
     )
-logger = get_logger(__name__)
+    logger = get_logger(__name__)
 
 
 # Prefix
 dataset_name = "tldr_news"
 model_path = f"pretrained-models/{args.model_path}"
+if accelerator.process_index == 0:
+    logger.info(f"Model: {args.model_path}")
+
+
+# Run resource monitor
+rm = ResourceMonitor()
+rm.start()
 
 
 # Create dataset
@@ -124,9 +132,10 @@ for epoch in range(args.epoch):
         optimizer.step()
         optimizer.zero_grad()
 
-        logger.info(
-            f"[epoch {epoch+1}] train step: {step + 1}/{len(train_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
-        )
+        if accelerator.process_index == 0:
+            logger.info(
+                f"[epoch {epoch+1}] train step: {step + 1}/{len(train_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+            )
     # <<< Train <<<
 
     # >>> Valid >>>
@@ -139,9 +148,10 @@ for epoch in range(args.epoch):
             outputs = model(**batch)
         loss_per_epoch += outputs.loss
 
-        logger.info(
-            f"[epoch {epoch+1}] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
-        )
+        if accelerator.process_index == 0:
+            logger.info(
+                f"[epoch {epoch+1}] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+            )
 
         logits = outputs.logits
         predictions = torch.argmax(logits, dim=-1)
@@ -154,5 +164,6 @@ for epoch in range(args.epoch):
     # logger.info(f"model saved: {save_path}")
 
     metric = metric.compute(model_id=model_path)
-    logger.info(f"[epoch {epoch+1}] mean perplexity: {metric['mean_perplexity']}")
-    logger.info(f"[epoch {epoch+1}] elapsed time: {time.time() - start_time} sec")
+    if accelerator.process_index == 0:
+        logger.info(f"[epoch {epoch+1}] mean perplexity: {metric['mean_perplexity']}")
+        logger.info(f"[epoch {epoch+1}] elapsed time: {time.time() - start_time} sec")

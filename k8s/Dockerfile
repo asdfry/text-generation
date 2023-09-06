@@ -9,6 +9,7 @@ RUN echo "alias ll='ls -al'" >> ~/.bashrc && \
 
 COPY create_volume.py create_volume.py
 COPY deploy.py deploy.py
+COPY command.txt command.txt
 
 # docker run -it --rm \
 # -v /etc/kubernetes/admin.conf:/root/.kube/config \

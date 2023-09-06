@@ -3,7 +3,7 @@ import argparse
 from kubernetes import client, config
 
 
-def create_master(node, port, gpu, slot, model_dir_path):
+def create_master(node: str, port: int, gpu: str, slot: int, log_dir_path: str, model_dir_path: str):
     pod_manifest = {
         "apiVersion": "v1",
         "kind": "Pod",
@@ -21,6 +21,7 @@ def create_master(node, port, gpu, slot, model_dir_path):
                     "image": f"{args.image_name}-{args.version}",
                     # "imagePullPolicy": "Always",
                     "volumeMounts": [
+                        {"name": "logs", "mountPath": "/root/logs"},
                         {"name": "pretrained-models", "mountPath": "/root/pretrained-models"},
                         {"name": "shmdir", "mountPath": "/dev/shm"},
                     ],
@@ -29,8 +30,7 @@ def create_master(node, port, gpu, slot, model_dir_path):
                         "-c",
                         f"/usr/sbin/sshd -p {port} && sleep infinity",
                     ],
-                    # "ports": [{"containerPort": port, "hostIP": ip, "hostPort": port}],
-                    "ports": [{"containerPort": port}],
+                    "ports": [{"containerPort": port, "hostPort": port, "protocol": "TCP"}],
                     "resources": {
                         "limits": {
                             gpu: str(slot),
@@ -40,10 +40,12 @@ def create_master(node, port, gpu, slot, model_dir_path):
                 },
             ],
             # "volumes": [
-            #     {"name": "pretrained-models", "persistentVolumeClaim": {"claimName": "jsh-pvc"}},
+            #     {"name": "logs", "persistentVolumeClaim": {"claimName": "jsh-logs-pvc"}},
+            #     {"name": "pretrained-models", "persistentVolumeClaim": {"claimName": "jsh-pretrained-models-pvc"}},
             #     {"name": "shmdir", "emptyDir": {"medium": "Memory", "sizeLimit": "256M"}},
             # ],
             "volumes": [
+                {"name": "logs", "hostPath": {"path": f"{log_dir_path}", "type": "Directory"}},
                 {"name": "pretrained-models", "hostPath": {"path": f"{model_dir_path}", "type": "Directory"}},
                 {"name": "shmdir", "emptyDir": {"medium": "Memory", "sizeLimit": "256M"}},
             ],
@@ -53,7 +55,7 @@ def create_master(node, port, gpu, slot, model_dir_path):
     print(f"POD (name: {pod_manifest['metadata']['name']}, node: {node}, port: {port})")
 
 
-def create_worker(node, port, gpu, slot, model_dir_path):
+def create_worker(node: str, port: int, gpu: str, slot: int, log_dir_path: str, model_dir_path: str):
     global worker_num
     pod_manifest = {
         "apiVersion": "v1",
@@ -72,6 +74,7 @@ def create_worker(node, port, gpu, slot, model_dir_path):
                     "image": f"{args.image_name}-{args.version}",
                     # "imagePullPolicy": "Always",
                     "volumeMounts": [
+                        {"name": "logs", "mountPath": "/root/logs"},
                         {"name": "pretrained-models", "mountPath": "/root/pretrained-models"},
                         {"name": "shmdir", "mountPath": "/dev/shm"},
                     ],
@@ -80,8 +83,7 @@ def create_worker(node, port, gpu, slot, model_dir_path):
                         "-c",
                         f"/usr/sbin/sshd -p {port} && sleep infinity",
                     ],
-                    # "ports": [{"containerPort": port, "hostIP": ip, "hostPort": port}],
-                    "ports": [{"containerPort": port}],
+                    "ports": [{"containerPort": port, "hostPort": port, "protocol": "TCP"}],
                     "resources": {
                         "limits": {
                             gpu: str(slot),
@@ -91,10 +93,12 @@ def create_worker(node, port, gpu, slot, model_dir_path):
                 },
             ],
             # "volumes": [
-            #     {"name": "pretrained-models", "persistentVolumeClaim": {"claimName": "jsh-pvc"}},
+            #     {"name": "logs", "persistentVolumeClaim": {"claimName": "jsh-logs-pvc"}},
+            #     {"name": "pretrained-models", "persistentVolumeClaim": {"claimName": "jsh-pretrained-models-pvc"}},
             #     {"name": "shmdir", "emptyDir": {"medium": "Memory", "sizeLimit": "256M"}},
             # ],
             "volumes": [
+                {"name": "logs", "hostPath": {"path": f"{log_dir_path}", "type": "Directory"}},
                 {"name": "pretrained-models", "hostPath": {"path": f"{model_dir_path}", "type": "Directory"}},
                 {"name": "shmdir", "emptyDir": {"medium": "Memory", "sizeLimit": "256M"}},
             ],
@@ -113,6 +117,7 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--total_node", type=int, required=True)
     parser.add_argument("-v", "--version", type=str, required=True)
     parser.add_argument("-z", "--zero_fill", type=int, required=True)
+    parser.add_argument("-lp", "--log_dir_path", type=str, required=True)
     parser.add_argument("-mn", "--master_node_num", type=int, required=True)
     parser.add_argument("-mp", "--model_dir_path", type=str, required=True)
     parser.add_argument("-gm", "--gpu_master", type=str, required=True)
@@ -127,9 +132,9 @@ if __name__ == "__main__":
 
     node_num = str(args.master_node_num).zfill(args.zero_fill)
     node = f"{args.node_prefix}{node_num}"
-    create_master(node, 1041, args.gpu_master, args.slot_size, args.model_dir_path)
+    create_master(node, 1041, args.gpu_master, args.slot_size, args.log_dir_path, args.model_dir_path)
 
     for i in range(1, args.total_node):
         node_num = str(args.master_node_num + i).zfill(args.zero_fill)
         node = f"{args.node_prefix}{node_num}"
-        create_worker(node, 1041, args.gpu_worker, args.slot_size, args.model_dir_path)
+        create_worker(node, 1041, args.gpu_worker, args.slot_size, args.log_dir_path, args.model_dir_path)
