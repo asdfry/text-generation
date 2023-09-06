@@ -162,7 +162,8 @@ cython_debug/
 tldr_news
 pretrained-models/
 models/
-logs/*.log
+*.log
+*.jsonl
 authorized_keys
 key.pem
 hpcx-v2.16-gcc-mlnx_ofed-ubuntu22.04-cuda12-gdrcopy2-nccl2.18-x86_64
