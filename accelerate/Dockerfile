@@ -49,8 +49,8 @@ RUN apt-get install -y curl python3.10-distutils && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy files that required for training
-RUN mkdir logs
 COPY tldr_news tldr_news
-COPY create_config.py create_config.py
-COPY train_multi.py train_multi.py
 COPY command.txt command.txt
+COPY train_multi.py train_multi.py
+COPY create_config.py create_config.py
+COPY resource_monitor.py resource_monitor.py
