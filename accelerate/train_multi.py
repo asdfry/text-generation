@@ -51,6 +51,8 @@ if accelerator.process_index == 0:
 # Run resource monitor
 rm = ResourceMonitor()
 rm.start()
+if accelerator.process_index == 0:
+    logger.info("Run resource monitor")
 
 
 # Create dataset

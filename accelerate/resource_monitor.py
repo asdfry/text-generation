@@ -60,5 +60,5 @@ class ResourceMonitor(Thread):
 
             time.sleep(1 - (time.perf_counter() - start_time))
 
-            with open(f"resource.{socket.gethostname()}.jsonl", "a+") as f:
+            with open(f"logs/resource.{socket.gethostname()}.jsonl", "a+") as f:
                 f.write(json.dumps(resource) + "\n")
