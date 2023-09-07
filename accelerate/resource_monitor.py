@@ -1,3 +1,4 @@
+import os
 import re
 import json
 import time
@@ -25,6 +26,10 @@ class ResourceMonitor(Thread):
                 with open(f"{path}/ports/1/counters/{cnt_name}", "r") as f:
                     cnt = int(f.read().strip())
                     self.latest[hca][cnt_name] = cnt
+        
+        self.jsonl = f"logs/resource.{socket.gethostname()}.jsonl"
+        if os.path.isfile(self.jsonl):
+            os.remove(self.jsonl)
 
     def run(self):
         while not self.stop_flag:
@@ -65,7 +70,7 @@ class ResourceMonitor(Thread):
             else:
                 time.sleep(sec)
 
-            with open(f"logs/resource.{socket.gethostname()}.jsonl", "a+") as f:
+            with open(self.jsonl, "a+") as f:
                 f.write(json.dumps(resource) + "\n")
 
     def stop(self):
