@@ -64,9 +64,9 @@ class ResourceMonitor(Thread):
                         resource["infiniband"][hca][cnt_name] = cnt - self.latest[hca][cnt_name]
                         self.latest[hca][cnt_name] = cnt
 
-            sec = 1 - (time.perf_counter() - start_time)
+            sec = 0.25 - (time.perf_counter() - start_time)
             if sec < 0:
-                time.sleep(1)
+                time.sleep(0.25)
             else:
                 time.sleep(sec)
 
