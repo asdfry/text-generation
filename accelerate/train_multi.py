@@ -49,10 +49,11 @@ if accelerator.process_index == 0:
 
 
 # Start resource monitor
-rm = ResourceMonitor()
-rm.start()
-if accelerator.process_index == 0:
-    logger.info("Start resource monitor")
+if accelerator.local_process_index == 0:
+    rm = ResourceMonitor()
+    rm.start()
+    if accelerator.process_index == 0:
+        logger.info("Start resource monitor")
 
 
 # Create dataset
@@ -172,6 +173,7 @@ for epoch in range(args.epoch):
 
 
 # Stop resource monitor
-rm.stop()
-if accelerator.process_index == 0:
-    logger.info("Stop resource monitor")
+if accelerator.local_process_index == 0:
+    rm.stop()
+    if accelerator.process_index == 0:
+        logger.info("Stop resource monitor")
