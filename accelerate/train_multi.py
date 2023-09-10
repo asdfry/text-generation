@@ -1,3 +1,4 @@
+import os
 import time
 import torch
 import logging
@@ -22,7 +23,7 @@ parser.add_argument("-n", "--num_proc", type=int, default=2)
 parser.add_argument("-o", "--optimizer", type=str, choices=["sgd", "adafactor", "adamw"], default="adafactor")
 parser.add_argument("-t", "--test", action="store_true")
 parser.add_argument("-ml", "--max_length", type=int, choices=[32, 64, 128, 256, 512], default=128)
-parser.add_argument("-mp", "--model_path", type=str, default="LLaMA-2-7B-32K")
+parser.add_argument("-mn", "--model_name", type=str, default="LLaMA-2-7B-32K")
 args = parser.parse_args()
 
 
@@ -32,25 +33,28 @@ accelerator = Accelerator()
 
 # Set logger
 if accelerator.process_index == 0:
-    filename = datetime.today().strftime("torch.%Y-%m-%d_%H-%M-%S")
+    today = datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
+    dirpath = f"logs/{args.model_name}/bs-{args.batch_size}"
+    os.makedirs(dirpath, exist_ok=True)
+    filepath = f"{dirpath}/torch.{today}.log"
     logging.basicConfig(
         format="%(asctime)s\t%(levelname)s\t%(message)s",
         level=logging.INFO,
-        handlers=[logging.FileHandler(f"logs/{filename}.log"), logging.StreamHandler()],
+        handlers=[logging.FileHandler(filepath), logging.StreamHandler()],
     )
     logger = get_logger(__name__)
 
 
 # Prefix
 dataset_name = "tldr_news"
-model_path = f"pretrained-models/{args.model_path}"
+model_path = f"pretrained-models/{args.model_name}"
 if accelerator.process_index == 0:
-    logger.info(f"Model: {args.model_path}")
+    logger.info(f"Model: {args.model_name}")
 
 
 # Start resource monitor
 if accelerator.local_process_index == 0:
-    rm = ResourceMonitor()
+    rm = ResourceMonitor(f"logs/{args.model_name}/bs-{args.batch_size}")
     rm.start()
     if accelerator.process_index == 0:
         logger.info("Start resource monitor")

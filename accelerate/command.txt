@@ -1,3 +1,3 @@
 python3 create_config.py -s 2 -t 2 -m 101.202.0.9
 source $HPCX_HOME/hpcx-init.sh && hpcx_load
-accelerate launch train_multi.py -b 2 -e 1 -ml 256 -mp bloom-560m
+accelerate launch train_multi.py -b 2 -e 1 -ml 256 -mn bloom-560m
