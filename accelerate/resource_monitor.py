@@ -64,6 +64,7 @@ class ResourceMonitor(Thread):
                     with open(f"{path}/ports/1/counters/{cnt_name}", "r") as f:
                         cnt = int(f.read().strip())
                         resource["infiniband"][hca][cnt_name] = cnt - self.last_cnt[hca][cnt_name]
+                        self.last_cnt[hca][cnt_name] = cnt
 
             sec = 1 - (time.perf_counter() - start_time)
             if sec < 0:
