@@ -28,6 +28,8 @@ class ResourceMonitor(Thread):
                     self.last_cnt[hca][cnt_name] = cnt
 
         self.jsonl = f"{dirpath}/resource.{socket.gethostname()}.jsonl"
+        if not os.path.isdir(dirpath):  # only required in local
+            os.makedirs(dirpath, exist_ok=True)
         if os.path.isfile(self.jsonl):
             os.remove(self.jsonl)
 
