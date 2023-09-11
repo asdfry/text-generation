@@ -12,7 +12,7 @@ def create_persistent_volume(name: str, access_mode: str, storage_size: int, hos
             "storageClassName": "",
             "accessModes": [access_mode],
             "capacity": {"storage": f"{storage_size}Gi"},
-            "nfs": {"path": host_path, "server": "k8s-node-1.idc-1.ten1010.io"},
+            "nfs": {"path": host_path, "server": "pnode1.idc1.ten1010.io"},
         },
     }
     v1.create_persistent_volume(pv_manifest)
