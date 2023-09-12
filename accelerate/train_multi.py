@@ -10,7 +10,7 @@ from datasets import load_from_disk
 from accelerate import Accelerator
 from torch.optim import SGD, AdamW
 from transformers import AutoTokenizer, AutoModelForCausalLM, Adafactor
-from resource_monitor import ResourceMonitor
+# from resource_monitor import ResourceMonitor
 from torch.utils.data import DataLoader
 from accelerate.logging import get_logger
 
@@ -53,11 +53,11 @@ if accelerator.process_index == 0:
 
 
 # Start resource monitor
-if accelerator.local_process_index == 0:
-    rm = ResourceMonitor(f"logs/{args.model_name}/bs-{args.batch_size}")
-    rm.start()
-    if accelerator.process_index == 0:
-        logger.info("Start resource monitor")
+# if accelerator.local_process_index == 0:
+#     rm = ResourceMonitor(f"logs/{args.model_name}/bs-{args.batch_size}")
+#     rm.start()
+#     if accelerator.process_index == 0:
+#         logger.info("Start resource monitor")
 
 
 # Create dataset
@@ -177,7 +177,7 @@ for epoch in range(args.epoch):
 
 
 # Stop resource monitor
-if accelerator.local_process_index == 0:
-    rm.stop()
-    if accelerator.process_index == 0:
-        logger.info("Stop resource monitor")
+# if accelerator.local_process_index == 0:
+#     rm.stop()
+#     if accelerator.process_index == 0:
+#         logger.info("Stop resource monitor")

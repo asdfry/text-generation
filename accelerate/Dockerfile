@@ -53,4 +53,4 @@ COPY tldr_news tldr_news
 COPY command.txt command.txt
 COPY train_multi.py train_multi.py
 COPY create_config.py create_config.py
-COPY resource_monitor.py resource_monitor.py
+# COPY resource_monitor.py resource_monitor.py
