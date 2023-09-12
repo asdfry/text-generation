@@ -17,6 +17,7 @@ from accelerate.logging import get_logger
 
 # Argparse
 parser = argparse.ArgumentParser()
+parser.add_argument("-a", "--aipub", action="store_true")
 parser.add_argument("-b", "--batch_size", type=int, required=True)
 parser.add_argument("-e", "--epoch", type=int, required=True)
 parser.add_argument("-n", "--num_proc", type=int, default=2)
@@ -34,7 +35,10 @@ accelerator = Accelerator()
 # Set logger
 if accelerator.process_index == 0:
     today = datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
-    dirpath = f"logs/{args.model_name}/bs-{args.batch_size}"
+    if args.aipub:
+        dirpath = f"mnt/logs/{args.model_name}/bs-{args.batch_size}"
+    else:
+        dirpath = f"logs/{args.model_name}/bs-{args.batch_size}"
     os.makedirs(dirpath, exist_ok=True)
     filepath = f"{dirpath}/torch.{today}.log"
     logging.basicConfig(
@@ -47,7 +51,10 @@ if accelerator.process_index == 0:
 
 # Prefix
 dataset_name = "tldr_news"
-model_path = f"pretrained-models/{args.model_name}"
+if args.aipub:
+    model_path = f"mnt/pretrained-models/{args.model_name}"
+else:
+    model_path = f"pretrained-models/{args.model_name}"
 if accelerator.process_index == 0:
     logger.info(f"Model: {args.model_name}")
 
