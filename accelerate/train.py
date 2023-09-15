@@ -118,7 +118,8 @@ model, optimizer, train_dataloader, valid_dataloader = accelerator.prepare(
 
 # Start training
 start_time = time.time()
-logger.info(f"Start training")
+if accelerator.process_index == 0:
+    logger.info(f"Start training")
 
 # Iterate data loader
 for epoch in range(args.epoch):
