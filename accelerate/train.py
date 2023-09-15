@@ -9,8 +9,7 @@ from datetime import datetime
 from datasets import load_from_disk
 from accelerate import Accelerator
 from torch.optim import SGD, AdamW
-from transformers import AutoTokenizer, AutoModelForCausalLM, Adafactor
-# from resource_monitor import ResourceMonitor
+from transformers import AutoTokenizer, AutoModelForCausalLM
 from torch.utils.data import DataLoader
 from accelerate.logging import get_logger
 
@@ -21,7 +20,7 @@ parser.add_argument("-a", "--aipub", action="store_true")
 parser.add_argument("-b", "--batch_size", type=int, required=True)
 parser.add_argument("-e", "--epoch", type=int, required=True)
 parser.add_argument("-n", "--num_proc", type=int, default=2)
-parser.add_argument("-o", "--optimizer", type=str, choices=["sgd", "adafactor", "adamw"], default="adafactor")
+parser.add_argument("-o", "--optimizer", type=str, choices=["sgd", "adamw"], default="adamw")
 parser.add_argument("-t", "--test", action="store_true")
 parser.add_argument("-ml", "--max_length", type=int, choices=[32, 64, 128, 256, 512], default=128)
 parser.add_argument("-mn", "--model_name", type=str, default="LLaMA-2-7B-32K")
@@ -57,14 +56,6 @@ else:
     model_path = f"pretrained-models/{args.model_name}"
 if accelerator.process_index == 0:
     logger.info(f"Model: {args.model_name}")
-
-
-# Start resource monitor
-# if accelerator.local_process_index == 0:
-#     rm = ResourceMonitor(f"logs/{args.model_name}/bs-{args.batch_size}")
-#     rm.start()
-#     if accelerator.process_index == 0:
-#         logger.info("Start resource monitor")
 
 
 # Create dataset
@@ -112,10 +103,8 @@ model = AutoModelForCausalLM.from_pretrained(model_path)
 # Set optimizer
 if args.optimizer == "sgd":
     optimizer = SGD(model.parameters(), lr=1e-5)
-elif args.optimizer == "adafactor":
-    optimizer = Adafactor(model.parameters())
 elif args.optimizer == "adamw":
-    optimizer = AdamW(model.parameters())
+    optimizer = AdamW(model.parameters(), lr=1e-5)
 
 
 # Ready for training with accelerate
@@ -127,8 +116,11 @@ model, optimizer, train_dataloader, valid_dataloader = accelerator.prepare(
 )
 
 
-# Iterate data loader
+# Start training
 start_time = time.time()
+logger.info(f"Start training")
+
+# Iterate data loader
 for epoch in range(args.epoch):
     # Load metric method
     metric = evaluate.load("perplexity")
@@ -181,10 +173,3 @@ for epoch in range(args.epoch):
     if accelerator.process_index == 0:
         logger.info(f"[epoch {epoch+1}] mean perplexity: {metric['mean_perplexity']}")
         logger.info(f"[epoch {epoch+1}] elapsed time: {time.time() - start_time} sec")
-
-
-# Stop resource monitor
-# if accelerator.local_process_index == 0:
-#     rm.stop()
-#     if accelerator.process_index == 0:
-#         logger.info("Stop resource monitor")

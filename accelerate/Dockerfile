@@ -17,7 +17,7 @@ ENV HF_DATASETS_OFFLINE=1
 
 # Install packages
 RUN apt-get update && \
-    apt-get install -y pdsh vim openssh-server git net-tools libnvidia-compute-515 && \
+    apt-get install -y pdsh vim openssh-server net-tools libnvidia-compute-515 && \
     mkdir -p /var/run/sshd
 
 # Set for ssh
@@ -39,18 +39,18 @@ RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86
 # Set hpc-x
 ENV HPCX_HOME=/usr/local/hpcx-v2.16-gcc-mlnx_ofed-ubuntu22.04-cuda12-gdrcopy2-nccl2.18-x86_64
 COPY hpcx-v2.16-gcc-mlnx_ofed-ubuntu22.04-cuda12-gdrcopy2-nccl2.18-x86_64 /usr/local/hpcx-v2.16-gcc-mlnx_ofed-ubuntu22.04-cuda12-gdrcopy2-nccl2.18-x86_64
-# RUN source $HPCX_HOME/hpcx-init.sh && hpcx_load
 
 # Install python & pip and Install libraries
+ENV DS_BUILD_CPU_ADAM=1
 COPY requirements.txt requirements.txt
-RUN apt-get install -y curl python3.10-distutils && \
+RUN apt-get install -y curl python3.10-dev python3.10-distutils && \
     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
     python3 get-pip.py && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install deepspeed==0.10.3
 
 # Copy files that required for training
 COPY tldr_news tldr_news
 COPY command.txt command.txt
-COPY train_multi.py train_multi.py
+COPY train.py train.py
 COPY create_config.py create_config.py
-# COPY resource_monitor.py resource_monitor.py

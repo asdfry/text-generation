@@ -3,7 +3,7 @@ python deploy.py \
 -n "k8s-node-" \
 -s 1 \
 -t 2 \
--v 20230906 \
+-v 20230915 \
 -z 1 \
 -lp /gpfs/user/jsh/logs \
 -mn 2 \
