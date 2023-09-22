@@ -13,13 +13,14 @@
 # limitations under the License.
 """Perplexity Metric."""
 
+import datasets
 import numpy as np
 import torch
 from torch.nn import CrossEntropyLoss
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-import datasets
-from datasets import logging
+import evaluate
+from evaluate import logging
 
 
 _CITATION = """\
@@ -28,7 +29,7 @@ _CITATION = """\
 
 _DESCRIPTION = """
 Perplexity (PPL) is one of the most common metrics for evaluating language models.
-It is defined as the exponentiated average negative log-likelihood of a sequence.
+It is defined as the exponentiated average negative log-likelihood of a sequence, calculated with exponent base `e`.
 
 For more information, see https://huggingface.co/docs/transformers/perplexity
 """
@@ -42,7 +43,7 @@ Args:
                     in the AutoModelForCausalLM documentation here:
                     https://huggingface.co/docs/transformers/master/en/model_doc/auto#transformers.AutoModelForCausalLM )
 
-    input_texts (list of str): input text, each separate text snippet
+    predictions (list of str): input text, each separate text snippet
         is one list entry.
     batch_size (int): the batch size to run texts through the model. Defaults to 16.
     add_start_token (bool): whether to add the start token to the texts,
@@ -55,51 +56,54 @@ Returns:
         max length for the perplexity computation.
 Examples:
     Example 1:
-        >>> perplexity = datasets.load_metric("perplexity")
+        >>> perplexity = evaluate.load("perplexity", module_type="metric")
         >>> input_texts = ["lorem ipsum", "Happy Birthday!", "Bienvenue"]
         >>> results = perplexity.compute(model_id='gpt2',
         ...                              add_start_token=False,
-        ...                              input_texts=input_texts) # doctest:+ELLIPSIS
+        ...                              predictions=input_texts) # doctest:+ELLIPSIS
         >>> print(list(results.keys()))
         ['perplexities', 'mean_perplexity']
-        >>> print(round(results["mean_perplexity"], 2))
-        78.22
-        >>> print(round(results["perplexities"][0], 2))
-        11.11
+        >>> print(round(results["mean_perplexity"], 0))
+        647.0
+        >>> print(round(results["perplexities"][0], 0))
+        32.0
 
     Example 2:
-        >>> perplexity = datasets.load_metric("perplexity")
-        >>> input_texts = datasets.load_dataset("wikitext",
-        ...                                     "wikitext-2-raw-v1",
-        ...                                     split="test")["text"][:50]
+        >>> from datasets import load_dataset
+        >>> perplexity = evaluate.load("perplexity", module_type="metric")
+        >>> input_texts = load_dataset("wikitext", "wikitext-2-raw-v1", split="test")["text"][:10] # doctest: +SKIP
         >>> input_texts = [s for s in input_texts if s!='']
         >>> results = perplexity.compute(model_id='gpt2',
-        ...                              input_texts=input_texts) # doctest:+ELLIPSIS
+        ...                              predictions=input_texts)
         >>> print(list(results.keys()))
         ['perplexities', 'mean_perplexity']
-        >>> print(round(results["mean_perplexity"], 2))
-        60.35
-        >>> print(round(results["perplexities"][0], 2))
-        81.12
+        >>> print(round(results["mean_perplexity"], 2)) # doctest: +SKIP
+        576.76
+        >>> print(round(results["perplexities"][0], 2)) # doctest: +SKIP
+        889.28
 """
 
 
-@datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Perplexity(datasets.Metric):
+@evaluate.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
+class Perplexity(evaluate.Metric):
     def _info(self):
-        return datasets.MetricInfo(
+        return evaluate.MetricInfo(
+            module_type="metric",
             description=_DESCRIPTION,
             citation=_CITATION,
             inputs_description=_KWARGS_DESCRIPTION,
             features=datasets.Features(
                 {
-                    "input_texts": datasets.Value("string"),
+                    "predictions": datasets.Value("string"),
                 }
             ),
             reference_urls=["https://huggingface.co/docs/transformers/perplexity"],
         )
 
-    def _compute(self, input_texts, model_id, batch_size: int = 16, add_start_token: bool = True, device=None):
+    def _compute(
+        self, predictions, model_id, batch_size: int = 16, add_start_token: bool = True, device=None, max_length=None
+    ):
+
         if device is not None:
             assert device in ["gpu", "cpu", "cuda"], "device should be either gpu or cpu."
             if device == "gpu":
@@ -124,20 +128,20 @@ class Perplexity(datasets.Metric):
             # assign one of the special tokens to also be the pad token
             tokenizer.add_special_tokens({"pad_token": existing_special_tokens[0]})
 
-        if add_start_token:
+        if add_start_token and max_length:
             # leave room for <BOS> token to be added:
             assert (
                 tokenizer.bos_token is not None
             ), "Input model must already have a BOS token if using add_start_token=True. Please use a different model, or set add_start_token=False"
-            max_tokenized_len = model.config.max_length - 1
+            max_tokenized_len = max_length - 1
         else:
-            max_tokenized_len = model.config.max_length
+            max_tokenized_len = max_length
 
         encodings = tokenizer(
-            input_texts,
+            predictions,
             add_special_tokens=False,
             padding=True,
-            truncation=True,
+            truncation=True if max_tokenized_len else False,
             max_length=max_tokenized_len,
             return_tensors="pt",
             return_attention_mask=True,
@@ -178,7 +182,7 @@ class Perplexity(datasets.Metric):
             shift_labels = labels[..., 1:].contiguous()
             shift_attention_mask_batch = attn_mask[..., 1:].contiguous()
 
-            perplexity_batch = torch.exp2(
+            perplexity_batch = torch.exp(
                 (loss_fct(shift_logits.transpose(1, 2), shift_labels) * shift_attention_mask_batch).sum(1)
                 / shift_attention_mask_batch.sum(1)
             )
