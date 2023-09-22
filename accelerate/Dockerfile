@@ -51,6 +51,7 @@ RUN apt-get install -y curl python3.10-dev python3.10-distutils && \
 
 # Copy files that required for training
 COPY tldr_news tldr_news
+COPY perplexity.py perplexity.py
 COPY command.txt command.txt
 COPY train.py train.py
 COPY create_config.py create_config.py
