@@ -124,7 +124,7 @@ if accelerator.process_index == 0:
 # Iterate data loader
 for epoch in range(args.epoch):
     # Load metric method
-    metric = evaluate.load("perplexity")
+    metric = evaluate.load("perplexity.py")
 
     # >>> Train >>>
     model.train()
