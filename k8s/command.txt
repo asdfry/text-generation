@@ -1,22 +1,9 @@
 python deploy.py \
--i asdfry/text-generation:accelerate \
+-i asdfry/train-llm:20230915 \
 -n "k8s-node-" \
--s 1 \
+-s 2 \
 -t 2 \
 -v 20230915 \
--z 1 \
--lp /gpfs/user/jsh/logs \
--mn 2 \
--mp /gpfs/user/jsh/train \
--gm ten1010.io/gpu-nvidia-a100-pcie-40gb \
--gw ten1010.io/gpu-tesla-t4
-
-python deploy.py \
--i asdfry/text-generation:horovod \
--n "k8s-node-" \
--s 1 \
--t 2 \
--v 20230830 \
 -z 1 \
 -lp /gpfs/user/jsh/logs \
 -mn 2 \
