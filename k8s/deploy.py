@@ -18,7 +18,7 @@ def create_master(node: str, port: int, gpu: str, slot: int, log_dir_path: str, 
             "containers": [
                 {
                     "name": "app",
-                    "image": f"{args.image_name}-{args.version}",
+                    "image": f"{args.image_name}:{args.version}",
                     # "imagePullPolicy": "Always",
                     "volumeMounts": [
                         {"name": "logs", "mountPath": "/root/logs"},
@@ -71,7 +71,7 @@ def create_worker(node: str, port: int, gpu: str, slot: int, log_dir_path: str, 
             "containers": [
                 {
                     "name": "app",
-                    "image": f"{args.image_name}-{args.version}",
+                    "image": f"{args.image_name}:{args.version}",
                     # "imagePullPolicy": "Always",
                     "volumeMounts": [
                         {"name": "logs", "mountPath": "/root/logs"},
