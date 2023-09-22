@@ -35,11 +35,11 @@ accelerator = Accelerator()
 if accelerator.process_index == 0:
     today = datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
     if args.aipub:
-        dirpath = f"mnt/logs/{args.model_name}/bs-{args.batch_size}"
+        dirpath = f"mnt/logs/{args.model_name}"
     else:
-        dirpath = f"logs/{args.model_name}/bs-{args.batch_size}"
+        dirpath = f"logs/{args.model_name}"
     os.makedirs(dirpath, exist_ok=True)
-    filepath = f"{dirpath}/torch.{today}.log"
+    filepath = f"{dirpath}/torch.np{accelerator.num_processes}.bs{args.batch_size}.{today}.log"
     logging.basicConfig(
         format="%(asctime)s\t%(levelname)s\t%(message)s",
         level=logging.INFO,
