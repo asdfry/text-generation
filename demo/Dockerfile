@@ -11,12 +11,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Set env for torch (compute capability)
 ENV TORCH_CUDA_ARCH_LIST=9.0
 
-# Set env for huggingface offline mode
-ENV HF_DATASETS_OFFLINE=1
-
 # Install packages
 RUN apt-get update && \
-    apt-get install -y pdsh vim openssh-server net-tools libnvidia-compute-515 && \
+    apt-get install -y pdsh vim openssh-server net-tools && \
     mkdir -p /var/run/sshd
 
 # Set for ssh
