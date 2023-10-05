@@ -5,7 +5,7 @@ import logging
 import argparse
 
 from datetime import datetime
-from datasets import load_from_disk
+from datasets import load_dataset
 from accelerate import Accelerator
 from torch.optim import SGD, AdamW
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -22,6 +22,7 @@ parser.add_argument("-n", "--num_proc", type=int, default=2)
 parser.add_argument("-o", "--optimizer", type=str, choices=["sgd", "adamw"], default="adamw")
 parser.add_argument("-t", "--test", action="store_true")
 parser.add_argument("-ml", "--max_length", type=int, choices=[32, 64, 128, 256, 512], default=128)
+parser.add_argument("-mn", "--model_name", type=str, default="bigscience/bloom-560m")
 args = parser.parse_args()
 
 
@@ -32,7 +33,7 @@ accelerator = Accelerator()
 # Set logger
 if accelerator.process_index == 0:
     today = datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
-    dirpath = f"logs/bloom-560m"
+    dirpath = f"logs/{args.model_name}"
     os.makedirs(dirpath, exist_ok=True)
     filepath = f"{dirpath}/torch.np{accelerator.num_processes}.bs{args.batch_size}.{today}.log"
     logging.basicConfig(
@@ -44,18 +45,17 @@ if accelerator.process_index == 0:
 
 
 # Prefix
-dataset_name = "tldr_news"
-model_path = "BigScience/bloom-560m"
+dataset_name = "JulesBelveze/tldr_news"
 if accelerator.process_index == 0:
-    logger.info(f"Model: bloom-560m")
+    logger.info(f"Model: {args.model_name}")
 
 
 # Create dataset
-datasets = load_from_disk(dataset_name)
+datasets = load_dataset(dataset_name)
 
 
 # Load tokenizer
-tokenizer = AutoTokenizer.from_pretrained(model_path)
+tokenizer = AutoTokenizer.from_pretrained(args.model_name)
 tokenizer.pad_token = tokenizer.eos_token
 
 
@@ -89,7 +89,7 @@ else:
 
 
 # Load model
-model = AutoModelForCausalLM.from_pretrained(model_path)
+model = AutoModelForCausalLM.from_pretrained(args.model_name)
 
 
 # Set optimizer
@@ -109,14 +109,62 @@ model, optimizer, train_dataloader, valid_dataloader = accelerator.prepare(
 
 
 # Start training
-start_time = time.time()
 if accelerator.process_index == 0:
+    start_time = time.time()
     logger.info(f"Start training")
 
-with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA], profile_memory=True) as prof:
+    with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA], profile_memory=True) as prof:
+        # Iterate data loader
+        for epoch in range(args.epoch):
+            # >>> Train >>>
+            model.train()
+            loss_per_epoch = 0
+
+            for step, batch in enumerate(train_dataloader):
+                batch = {k: v for k, v in batch.items()}
+                outputs = model(**batch)
+                loss = outputs.loss
+                loss_per_epoch += loss
+                accelerator.backward(loss)
+                optimizer.step()
+                optimizer.zero_grad()
+
+                logger.info(
+                    f"[epoch {epoch+1}] train step: {step + 1}/{len(train_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+                )
+            # <<< Train <<<
+
+            # >>> Valid >>>
+            model.eval()
+            loss_per_epoch = 0
+
+            for step, batch in enumerate(valid_dataloader):
+                batch = {k: v for k, v in batch.items()}
+                with torch.no_grad():
+                    outputs = model(**batch)
+                loss_per_epoch += outputs.loss
+
+                logger.info(
+                    f"[epoch {epoch+1}] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+                )
+            # <<< Valid <<<
+
+            logger.info(f"[epoch {epoch+1}] elapsed time: {time.time() - start_time} sec")
+
+    logger.info(f"End training")
+    logger.info(
+        f"Result of profile (sort by cpu)"
+        f"\n{prof.key_averages().table(sort_by='self_cpu_time_total', row_limit=5)}"
+    )
+    logger.info(
+        f"Result of profile (sort by gpu)"
+        f"\n{prof.key_averages().table(sort_by='self_cuda_time_total', row_limit=5)}"
+    )
+    prof.export_chrome_trace(f"logs/{args.model_name}/trace.json")
+
+else:
     # Iterate data loader
     for epoch in range(args.epoch):
-
         # >>> Train >>>
         model.train()
         loss_per_epoch = 0
@@ -129,11 +177,6 @@ with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA], profile_m
             accelerator.backward(loss)
             optimizer.step()
             optimizer.zero_grad()
-
-            if accelerator.process_index == 0:
-                logger.info(
-                    f"[epoch {epoch+1}] train step: {step + 1}/{len(train_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
-                )
         # <<< Train <<<
 
         # >>> Valid >>>
@@ -145,20 +188,4 @@ with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA], profile_m
             with torch.no_grad():
                 outputs = model(**batch)
             loss_per_epoch += outputs.loss
-
-            if accelerator.process_index == 0:
-                logger.info(
-                    f"[epoch {epoch+1}] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
-                )
         # <<< Valid <<<
-
-        save_path = f"./models/epoch-{epoch + 1}"
-        unwraped_model = accelerator.unwrap_model(model)
-        unwraped_model.save_pretrained(save_path)
-        logger.info(f"[epoch {epoch+1}] model saved: {save_path}")
-
-        if accelerator.process_index == 0:
-            logger.info(f"[epoch {epoch+1}] elapsed time: {time.time() - start_time} sec")
-
-if accelerator.process_index == 0:
-    logger.info(f"End training")

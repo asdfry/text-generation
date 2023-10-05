@@ -162,7 +162,7 @@ cython_debug/
 tldr_news
 pretrained-models/
 models/
-*.log
+logs/
 *.jsonl
 authorized_keys
 key.pem
