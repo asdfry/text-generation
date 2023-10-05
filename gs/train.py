@@ -114,76 +114,43 @@ model, optimizer, train_dataloader, valid_dataloader = accelerator.prepare(
 
 
 # Start training
-if accelerator.process_index == 0:
-    start_time = time.time()
-    logger.info(f"Start training")
+start_time = time.time()
+logger.info(f"Start training")
 
-    with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA], profile_memory=True) as prof:
-        # Iterate data loader
-        for epoch in range(args.epoch):
-            # >>> Train >>>
-            model.train()
-            loss_per_epoch = 0
 
-            for step, batch in enumerate(train_dataloader):
-                batch = {k: v for k, v in batch.items()}
-                outputs = model(**batch)
-                loss = outputs.loss
-                loss_per_epoch += loss
-                accelerator.backward(loss)
-                optimizer.step()
-                optimizer.zero_grad()
+# Iterate data loader
+for epoch in range(args.epoch):
+    # >>> Train >>>
+    model.train()
+    loss_per_epoch = 0
 
-                logger.info(
-                    f"[epoch {epoch+1}] train step: {step + 1}/{len(train_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
-                )
-            # <<< Train <<<
+    for step, batch in enumerate(train_dataloader):
+        batch = {k: v for k, v in batch.items()}
+        outputs = model(**batch)
+        loss = outputs.loss
+        loss_per_epoch += loss
+        accelerator.backward(loss)
+        optimizer.step()
+        optimizer.zero_grad()
 
-            # >>> Valid >>>
-            model.eval()
-            loss_per_epoch = 0
+        logger.info(
+            f"[epoch {epoch+1}] train step: {step + 1}/{len(train_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+        )
+    # <<< Train <<<
 
-            for step, batch in enumerate(valid_dataloader):
-                batch = {k: v for k, v in batch.items()}
-                with torch.no_grad():
-                    outputs = model(**batch)
-                loss_per_epoch += outputs.loss
+    # >>> Valid >>>
+    model.eval()
+    loss_per_epoch = 0
 
-                logger.info(
-                    f"[epoch {epoch+1}] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
-                )
-            # <<< Valid <<<
-
-            logger.info(f"[epoch {epoch+1}] elapsed time: {time.time() - start_time} sec")
-
-    logger.info(f"Result of profile" f"\n{prof.key_averages().table()}")
-    prof.export_chrome_trace(f"logs/{args.model_name}/trace.json")
-    logger.info(f"End training (elapsed time: {time.time() - start_time} sec)")
-
-else:
-    # Iterate data loader
-    for epoch in range(args.epoch):
-        # >>> Train >>>
-        model.train()
-        loss_per_epoch = 0
-
-        for step, batch in enumerate(train_dataloader):
-            batch = {k: v for k, v in batch.items()}
+    for step, batch in enumerate(valid_dataloader):
+        batch = {k: v for k, v in batch.items()}
+        with torch.no_grad():
             outputs = model(**batch)
-            loss = outputs.loss
-            loss_per_epoch += loss
-            accelerator.backward(loss)
-            optimizer.step()
-            optimizer.zero_grad()
-        # <<< Train <<<
+        loss_per_epoch += outputs.loss
 
-        # >>> Valid >>>
-        model.eval()
-        loss_per_epoch = 0
+        logger.info(
+            f"[epoch {epoch+1}] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+        )
+    # <<< Valid <<<
 
-        for step, batch in enumerate(valid_dataloader):
-            batch = {k: v for k, v in batch.items()}
-            with torch.no_grad():
-                outputs = model(**batch)
-            loss_per_epoch += outputs.loss
-        # <<< Valid <<<
+logger.info(f"End training")
