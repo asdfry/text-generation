@@ -9,7 +9,7 @@ from datasets import load_dataset
 from accelerate import Accelerator
 from torch.optim import SGD, AdamW
 from transformers import AutoTokenizer, AutoModelForCausalLM
-from torch.profiler import profile, record_function, ProfilerActivity
+from torch.profiler import profile, ProfilerActivity
 from torch.utils.data import DataLoader
 from accelerate.logging import get_logger
 
@@ -17,10 +17,10 @@ from accelerate.logging import get_logger
 # Argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-b", "--batch_size", type=int, required=True)
+parser.add_argument("-d", "--dataset_size", type=float, default=1.0)
 parser.add_argument("-e", "--epoch", type=int, required=True)
 parser.add_argument("-n", "--num_proc", type=int, default=2)
 parser.add_argument("-o", "--optimizer", type=str, choices=["sgd", "adamw"], default="adamw")
-parser.add_argument("-t", "--test", action="store_true")
 parser.add_argument("-ml", "--max_length", type=int, choices=[32, 64, 128, 256, 512], default=128)
 parser.add_argument("-mn", "--model_name", type=str, default="bigscience/bloom-560m")
 args = parser.parse_args()
@@ -78,14 +78,19 @@ tokenized_datasets.set_format("torch")
 
 
 # Create dataloader
-if args.test:
-    small_train_dataset = tokenized_datasets["train"].shuffle(seed=77).select(range(160 * 2))
-    small_valid_dataset = tokenized_datasets["test"].shuffle(seed=77).select(range(80))
-    train_dataloader = DataLoader(small_train_dataset, shuffle=True, batch_size=args.batch_size)
-    valid_dataloader = DataLoader(small_valid_dataset, batch_size=args.batch_size)
-else:
-    train_dataloader = DataLoader(tokenized_datasets["train"], shuffle=True, batch_size=args.batch_size)
-    valid_dataloader = DataLoader(tokenized_datasets["test"], batch_size=args.batch_size)
+train_dataset = (
+    tokenized_datasets["train"]
+    .shuffle(seed=77)
+    .select(range(int(tokenized_datasets["train"].num_rows * args.dataset_size)))
+)
+valid_dataset = (
+    tokenized_datasets["test"]
+    .shuffle(seed=77)
+    .select(range(int(tokenized_datasets["test"].num_rows * args.dataset_size)))
+)
+
+train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=args.batch_size)
+valid_dataloader = DataLoader(valid_dataset, batch_size=args.batch_size)
 
 
 # Load model
