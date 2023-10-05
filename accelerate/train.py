@@ -49,11 +49,12 @@ if accelerator.process_index == 0:
 
 
 # Prefix
-dataset_name = "tldr_news"
 if args.aipub:
     model_path = f"mnt/pretrained-models/{args.model_name}"
+    dataset_name = "mnt/tldr_news"
 else:
     model_path = f"pretrained-models/{args.model_name}"
+    dataset_name = "tldr_news"
 if accelerator.process_index == 0:
     logger.info(f"Model: {args.model_name}")
 
@@ -165,10 +166,10 @@ for epoch in range(args.epoch):
         metric.add_batch(predictions=tokenizer.batch_decode(predictions))
     # <<< Valid <<<
 
-    # save_path = f"./models/epoch-{epoch + 1}"
-    # unwraped_model = accelerator.unwrap_model(model)
-    # unwraped_model.save_pretrained(save_path)
-    # logger.info(f"model saved: {save_path}")
+    save_path = f"mnt/models/np{accelerator.num_processes}.bs{args.batch_size}.e{epoch + 1}"
+    unwraped_model = accelerator.unwrap_model(model)
+    unwraped_model.save_pretrained(save_path)
+    logger.info(f"[epoch {epoch+1}] model saved: {save_path}")
 
     metric = metric.compute(model_id=model_path)
     if accelerator.process_index == 0:
