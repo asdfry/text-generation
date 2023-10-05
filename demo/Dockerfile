@@ -32,7 +32,6 @@ RUN apt-get install -y curl python3.10-dev python3.10-distutils && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy files that required for training
-COPY tldr_news tldr_news
 COPY run.sh run.sh
 COPY train.py train.py
 COPY config.yaml config.yaml
