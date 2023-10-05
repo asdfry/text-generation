@@ -151,7 +151,6 @@ if accelerator.process_index == 0:
 
             logger.info(f"[epoch {epoch+1}] elapsed time: {time.time() - start_time} sec")
 
-    logger.info(f"End training")
     logger.info(
         f"Result of profile (sort by cpu)"
         f"\n{prof.key_averages().table(sort_by='self_cpu_time_total', row_limit=5)}"
@@ -161,6 +160,8 @@ if accelerator.process_index == 0:
         f"\n{prof.key_averages().table(sort_by='self_cuda_time_total', row_limit=5)}"
     )
     prof.export_chrome_trace(f"logs/{args.model_name}/trace.json")
+
+    logger.info(f"End training (elapsed time: {time.time() - start_time} sec)")
 
 else:
     # Iterate data loader
