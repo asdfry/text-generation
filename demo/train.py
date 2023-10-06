@@ -4,12 +4,11 @@ import torch
 import logging
 import argparse
 
-from datetime import datetime
 from datasets import load_dataset
 from accelerate import Accelerator
 from torch.optim import SGD, AdamW
 from transformers import AutoTokenizer, AutoModelForCausalLM
-from torch.profiler import profile, ProfilerActivity
+from torch.profiler import profile
 from torch.utils.data import DataLoader
 from accelerate.logging import get_logger
 
@@ -32,10 +31,11 @@ accelerator = Accelerator()
 
 # Set logger
 if accelerator.process_index == 0:
-    today = datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
-    dirpath = f"logs/{args.model_name}"
+    dirpath = f"logs/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
     os.makedirs(dirpath, exist_ok=True)
-    filepath = f"{dirpath}/torch.np{accelerator.num_processes}.bs{args.batch_size}.{today}.log"
+    filepath = f"{dirpath}/torch.log"
+    if os.path.exists(filepath):
+        os.remove(filepath)
     logging.basicConfig(
         format="%(asctime)s\t%(levelname)s\t%(message)s",
         level=logging.INFO,
@@ -118,7 +118,7 @@ if accelerator.process_index == 0:
     start_time = time.time()
     logger.info(f"Start training")
 
-    with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA], profile_memory=True) as prof:
+    with profile(with_stack=True) as prof:
         # Iterate data loader
         for epoch in range(args.epoch):
             # >>> Train >>>
@@ -156,9 +156,8 @@ if accelerator.process_index == 0:
 
             logger.info(f"[epoch {epoch+1}] elapsed time: {time.time() - start_time} sec")
 
-    logger.info(f"Result of profile" f"\n{prof.key_averages().table()}")
-    prof.export_chrome_trace(f"logs/{args.model_name}/trace.json")
-    logger.info(f"End training (elapsed time: {time.time() - start_time} sec)")
+    prof.export_chrome_trace(f"{dirpath}/trace.json")
+    logger.info(f"Result of profile\n{prof.key_averages(group_by_stack_n=1).table(sort_by='self_cpu_time_total', row_limit=-1, max_name_column_width=110)}")
 
 else:
     # Iterate data loader
