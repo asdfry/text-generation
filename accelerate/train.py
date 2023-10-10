@@ -171,10 +171,11 @@ for epoch in range(args.epoch):
         metric.add_batch(predictions=tokenizer.batch_decode(predictions))
     # <<< Valid <<<
 
-    save_path = f"mnt/models/np{accelerator.num_processes}.bs{args.batch_size}.e{epoch + 1}"
-    unwraped_model = accelerator.unwrap_model(model)
-    unwraped_model.save_pretrained(save_path)
-    logger.info(f"[epoch {epoch+1}] model saved: {save_path}")
+    if args.aipub:
+        save_path = f"mnt/models/np{accelerator.num_processes}.bs{args.batch_size}.e{epoch + 1}"
+        unwraped_model = accelerator.unwrap_model(model)
+        unwraped_model.save_pretrained(save_path)
+        logger.info(f"[epoch {epoch+1}] model saved: {save_path}")
 
     metric = metric.compute(model_id=model_path)
     if accelerator.process_index == 0:
