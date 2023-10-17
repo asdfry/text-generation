@@ -42,14 +42,14 @@ if accelerator.process_index == 0:
         handlers=[logging.FileHandler(filepath), logging.StreamHandler()],
     )
     logger = get_logger(__name__)
+    start_time = time.time()
 
-
-# Create datase
+# Create dataset
 dataset_name = "JulesBelveze/tldr_news"
 datasets = load_dataset(dataset_name)
 
 
-# Load tokenize
+# Load tokenizer
 tokenizer = AutoTokenizer.from_pretrained(args.model_name)
 tokenizer.pad_token = tokenizer.eos_token
 
@@ -60,7 +60,7 @@ def tokenize_function(examples):
     return result
 
 
-# Tokenize
+# Tokenizer
 # before tokenize: ['headline', 'content', 'category']
 # after tokenize: ['input_ids', 'attention_mask', 'labels'
 tokenized_datasets = datasets.map(
@@ -72,7 +72,7 @@ tokenized_datasets = datasets.map(
 tokenized_datasets.set_format("torch")
 
 
-# Create dataloade
+# Create dataloader
 train_dataset = (
     tokenized_datasets["train"]
     .shuffle(seed=77)
@@ -92,20 +92,20 @@ train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=args.batch
 valid_dataloader = DataLoader(valid_dataset, batch_size=args.batch_size)
 
 
-# Load mode
+# Load model
 if accelerator.process_index == 0:
     logger.info(f"Model: {args.model_name}")
 model = AutoModelForCausalLM.from_pretrained(args.model_name)
 
 
-# Set optimize
+# Set optimizer
 if args.optimizer == "sgd":
     optimizer = SGD(model.parameters(), lr=1e-5)
 elif args.optimizer == "adamw":
     optimizer = AdamW(model.parameters(), lr=1e-5)
 
 
-# Ready for training with accelerat
+# Ready for training with accelerate
 model, optimizer, train_dataloader, valid_dataloader = accelerator.prepare(
     model,
     optimizer,
@@ -121,7 +121,7 @@ if accelerator.process_index == 0:
         schedule=schedule(wait=1, warmup=1, active=2, repeat=1),
         on_trace_ready=tensorboard_trace_handler(dirpath),
     ) as prof:
-        start_time = time.time()
+        epoch_time = time.time()
         logger.info(f"Start training")
 
         # >>> Train >>>
@@ -145,23 +145,25 @@ if accelerator.process_index == 0:
         # <<< Train <<<
 
         # >>> Valid >>>
-        # model.eval()
-        # loss_per_epoch = 0
+        model.eval()
+        loss_per_epoch = 0
 
-        # for step, batch in enumerate(valid_dataloader):
-        #     batch = {k: v for k, v in batch.items()}
-        #     with torch.no_grad():
-        #         outputs = model(**batch)
-        #     loss_per_epoch += outputs.loss
+        for step, batch in enumerate(valid_dataloader):
+            batch = {k: v for k, v in batch.items()}
+            with torch.no_grad():
+                outputs = model(**batch)
+            loss_per_epoch += outputs.loss
 
-        #     if accelerator.process_index == 0:
-        #         logger.info(
-        #             f"[epoch 1] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
-        #         )
-        #     prof.step()
+            if accelerator.process_index == 0:
+                logger.info(
+                    f"[epoch 1] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+                )
+            prof.step()
         # <<< Valid <<<
 
-        logger.info(f"[epoch 1] elapsed time: {time.time() - start_time} sec")
+        logger.info(f"[epoch 1] elapsed time: {time.time() - epoch_time} sec")
+    
+    logger.info(f"End training (total elapsed time: {time.time() - start_time} sec)")
 
 else:
     # >>> Train >>>
@@ -179,12 +181,12 @@ else:
     # <<< Train <<<
 
     # >>> Valid >>>
-    # model.eval()
-    # loss_per_epoch = 0
+    model.eval()
+    loss_per_epoch = 0
 
-    # for step, batch in enumerate(valid_dataloader):
-    #     batch = {k: v for k, v in batch.items()}
-    #     with torch.no_grad():
-    #         outputs = model(**batch)
-    #     loss_per_epoch += outputs.loss
+    for step, batch in enumerate(valid_dataloader):
+        batch = {k: v for k, v in batch.items()}
+        with torch.no_grad():
+            outputs = model(**batch)
+        loss_per_epoch += outputs.loss
     # <<< Valid <<<
