@@ -149,11 +149,9 @@ if accelerator.process_index == 0:
             accelerator.backward(loss)
             optimizer.step()
             optimizer.zero_grad()
-
-            if accelerator.process_index == 0:
-                logger.info(
-                    f"[epoch 1] train step: {step + 1}/{len(train_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
-                )
+            logger.info(
+                f"[epoch 1] train step: {step + 1}/{len(train_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+            )
             prof.step()
         # <<< Train <<<
 
@@ -166,16 +164,14 @@ if accelerator.process_index == 0:
             with torch.no_grad():
                 outputs = model(**batch)
             loss_per_epoch += outputs.loss
-
-            if accelerator.process_index == 0:
-                logger.info(
-                    f"[epoch 1] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
-                )
+            logger.info(
+                f"[epoch 1] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+            )
             prof.step()
         # <<< Valid <<<
 
         logger.info(f"[epoch 1] elapsed time: {time.time() - epoch_time} sec")
-    
+
     logger.info(f"End training (total elapsed time: {time.time() - start_time} sec)")
 
 else:
