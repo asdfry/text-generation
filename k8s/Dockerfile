@@ -7,10 +7,7 @@ RUN echo "alias ll='ls -al'" >> ~/.bashrc && \
     apt-get install -y vim && \
     pip install kubernetes==26.1.0
 
-COPY create_volume.py create_volume.py
+COPY pods pods
 COPY deploy.py deploy.py
 COPY command.txt command.txt
-
-# docker run -it --rm \
-# -v /etc/kubernetes/admin.conf:/root/.kube/config \
-# python:3.10.6-slim-kube /bin/bash
+COPY create_volume.py create_volume.py
