@@ -3,13 +3,12 @@ import time
 import torch
 import logging
 import argparse
-import evaluate
 
-from datetime import datetime
 from datasets import load_from_disk
 from accelerate import Accelerator
 from torch.optim import SGD, AdamW
 from transformers import AutoTokenizer, AutoModelForCausalLM
+from torch.profiler import profile, schedule, tensorboard_trace_handler, ProfilerActivity
 from torch.utils.data import DataLoader
 from accelerate.logging import get_logger
 
@@ -33,19 +32,21 @@ accelerator = Accelerator()
 
 # Set logger
 if accelerator.process_index == 0:
-    today = datetime.today().strftime("%Y-%m-%d_%H-%M-%S")
     if args.aipub:
-        dirpath = f"mnt/logs/{args.model_name}"
+        dirpath = f"mnt/logs/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
     else:
-        dirpath = f"logs/{args.model_name}"
+        dirpath = f"logs/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
     os.makedirs(dirpath, exist_ok=True)
-    filepath = f"{dirpath}/torch.np{accelerator.num_processes}.bs{args.batch_size}.{today}.log"
+    filepath = f"{dirpath}/torch.log"
+    if os.path.exists(filepath):
+        os.remove(filepath)
     logging.basicConfig(
         format="%(asctime)s\t%(levelname)s\t%(message)s",
         level=logging.INFO,
         handlers=[logging.FileHandler(filepath), logging.StreamHandler()],
     )
     logger = get_logger(__name__)
+    start_time = time.time()
 
 
 # Prefix
@@ -55,8 +56,6 @@ if args.aipub:
 else:
     model_path = f"pretrained-models/{args.model_name}"
     dataset_name = "tldr_news"
-if accelerator.process_index == 0:
-    logger.info(f"Model: {args.model_name}")
 
 
 # Create dataset
@@ -98,11 +97,17 @@ valid_dataset = (
     .select(range(int(tokenized_datasets["test"].num_rows * args.dataset_size)))
 )
 
+if accelerator.process_index == 0:
+    logger.info(f"Train dataset size: {len(train_dataset)}")
+    logger.info(f"Valid dataset size: {len(valid_dataset)}")
+
 train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=args.batch_size)
 valid_dataloader = DataLoader(valid_dataset, batch_size=args.batch_size)
 
 
 # Load model
+if accelerator.process_index == 0:
+    logger.info(f"Model: {args.model_name}")
 model = AutoModelForCausalLM.from_pretrained(model_path)
 
 
@@ -122,16 +127,58 @@ model, optimizer, train_dataloader, valid_dataloader = accelerator.prepare(
 )
 
 
-# Start training
-start_time = time.time()
+# Start training with profiler
 if accelerator.process_index == 0:
-    logger.info(f"Start training")
+    with profile(
+        activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+        schedule=schedule(wait=1, warmup=1, active=2, repeat=1),
+        on_trace_ready=tensorboard_trace_handler(dirpath),
+    ) as prof:
+        epoch_time = time.time()
+        logger.info(f"Start training")
 
-# Iterate data loader
-for epoch in range(args.epoch):
-    # Load metric method
-    metric = evaluate.load("perplexity.py")
+        # >>> Train >>>
+        model.train()
+        loss_per_epoch = 0
 
+        for step, batch in enumerate(train_dataloader):
+            batch = {k: v for k, v in batch.items()}
+            outputs = model(**batch)
+            loss = outputs.loss
+            loss_per_epoch += loss
+            accelerator.backward(loss)
+            optimizer.step()
+            optimizer.zero_grad()
+
+            if accelerator.process_index == 0:
+                logger.info(
+                    f"[epoch 1] train step: {step + 1}/{len(train_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+                )
+            prof.step()
+        # <<< Train <<<
+
+        # >>> Valid >>>
+        model.eval()
+        loss_per_epoch = 0
+
+        for step, batch in enumerate(valid_dataloader):
+            batch = {k: v for k, v in batch.items()}
+            with torch.no_grad():
+                outputs = model(**batch)
+            loss_per_epoch += outputs.loss
+
+            if accelerator.process_index == 0:
+                logger.info(
+                    f"[epoch 1] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+                )
+            prof.step()
+        # <<< Valid <<<
+
+        logger.info(f"[epoch 1] elapsed time: {time.time() - epoch_time} sec")
+    
+    logger.info(f"End training (total elapsed time: {time.time() - start_time} sec)")
+
+else:
     # >>> Train >>>
     model.train()
     loss_per_epoch = 0
@@ -144,11 +191,6 @@ for epoch in range(args.epoch):
         accelerator.backward(loss)
         optimizer.step()
         optimizer.zero_grad()
-
-        if accelerator.process_index == 0:
-            logger.info(
-                f"[epoch {epoch+1}] train step: {step + 1}/{len(train_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
-            )
     # <<< Train <<<
 
     # >>> Valid >>>
@@ -160,24 +202,4 @@ for epoch in range(args.epoch):
         with torch.no_grad():
             outputs = model(**batch)
         loss_per_epoch += outputs.loss
-
-        if accelerator.process_index == 0:
-            logger.info(
-                f"[epoch {epoch+1}] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
-            )
-
-        logits = outputs.logits
-        predictions = torch.argmax(logits, dim=-1)
-        metric.add_batch(predictions=tokenizer.batch_decode(predictions))
     # <<< Valid <<<
-
-    if args.aipub:
-        save_path = f"mnt/models/np{accelerator.num_processes}.bs{args.batch_size}.e{epoch + 1}"
-        unwraped_model = accelerator.unwrap_model(model)
-        unwraped_model.save_pretrained(save_path)
-        logger.info(f"[epoch {epoch+1}] model saved: {save_path}")
-
-    metric = metric.compute(model_id=model_path)
-    if accelerator.process_index == 0:
-        logger.info(f"[epoch {epoch+1}] mean perplexity: {metric['mean_perplexity']}")
-        logger.info(f"[epoch {epoch+1}] elapsed time: {time.time() - start_time} sec")
