@@ -161,8 +161,7 @@ cython_debug/
 .vscode/
 tldr_news
 pretrained-models/
-models/
-logs/
+output/
 *.jsonl
 authorized_keys
 key.pem

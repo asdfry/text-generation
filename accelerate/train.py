@@ -10,6 +10,7 @@ from torch.optim import SGD, AdamW
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from torch.profiler import profile, schedule, tensorboard_trace_handler, ProfilerActivity
 from torch.utils.data import DataLoader
+from metric_collector import MetricCollector
 from accelerate.logging import get_logger
 
 
@@ -30,23 +31,35 @@ args = parser.parse_args()
 accelerator = Accelerator()
 
 
-# Set logger
+# Set logger & Start metric collector
 if accelerator.process_index == 0:
+    start_time = time.time()
+
     if args.aipub:
-        dirpath = f"mnt/logs/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
+        dirpath = f"mnt/output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
     else:
-        dirpath = f"logs/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
+        dirpath = f"output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
     os.makedirs(dirpath, exist_ok=True)
+
     filepath = f"{dirpath}/torch.log"
     if os.path.exists(filepath):
         os.remove(filepath)
+
     logging.basicConfig(
         format="%(asctime)s\t%(levelname)s\t%(message)s",
         level=logging.INFO,
         handlers=[logging.FileHandler(filepath), logging.StreamHandler()],
     )
     logger = get_logger(__name__)
-    start_time = time.time()
+
+    mc = MetricCollector(
+        prometheus_ip="http://101.202.0.9:30003",
+        node_address="192.168.10.5:9100",
+        hostname="k8s-node-3",
+        dirpath=dirpath,
+        logger=logger,
+    )
+    mc.start()
 
 
 # Prefix
@@ -80,6 +93,7 @@ tokenized_datasets = datasets.map(
     tokenize_function,
     batched=True,
     num_proc=args.num_proc,
+    load_from_cache_file=False,
     remove_columns=datasets["train"].column_names,  # remove columns that are not required for model input
 )
 tokenized_datasets.set_format("torch")
@@ -151,7 +165,7 @@ if accelerator.process_index == 0:
                 optimizer.step()
                 optimizer.zero_grad()
                 logger.info(
-                    f"[epoch {epoch}] train step: {step + 1}/{len(train_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+                    f"[epoch {epoch + 1}] train step: {step + 1}/{len(train_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
                 )
                 prof.step()
             # <<< Train <<<
@@ -166,14 +180,24 @@ if accelerator.process_index == 0:
                     outputs = model(**batch)
                 loss_per_epoch += outputs.loss
                 logger.info(
-                    f"[epoch {epoch}] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+                    f"[epoch {epoch + 1}] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
                 )
                 prof.step()
             # <<< Valid <<<
 
-            logger.info(f"[epoch {epoch}] elapsed time: {time.time() - epoch_time} sec")
+            logger.info(f"[epoch {epoch + 1}] elapsed time: {time.time() - epoch_time} sec")
+
+            unwrapped_model = accelerator.unwrap_model(model)
+            unwrapped_model.save_pretrained(
+                f"{dirpath}/epoch-{epoch + 1}",
+                is_main_process=accelerator.is_main_process,
+                save_function=accelerator.save,
+            )
+            logger.info(f"Save model (path: {dirpath}/epoch-{epoch + 1}/)")
 
     logger.info(f"End training (total elapsed time: {time.time() - start_time} sec)")
+
+    mc.stop()
 
 else:
     for epoch in range(args.epoch):
