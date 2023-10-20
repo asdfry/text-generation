@@ -134,9 +134,49 @@ if accelerator.process_index == 0:
         schedule=schedule(wait=1, warmup=1, active=2, repeat=1),
         on_trace_ready=tensorboard_trace_handler(dirpath),
     ) as prof:
-        epoch_time = time.time()
-        logger.info(f"Start training")
+        for epoch in range(args.epoch):
+            epoch_time = time.time()
+            logger.info(f"Start training")
 
+            # >>> Train >>>
+            model.train()
+            loss_per_epoch = 0
+
+            for step, batch in enumerate(train_dataloader):
+                batch = {k: v for k, v in batch.items()}
+                outputs = model(**batch)
+                loss = outputs.loss
+                loss_per_epoch += loss
+                accelerator.backward(loss)
+                optimizer.step()
+                optimizer.zero_grad()
+                logger.info(
+                    f"[epoch {epoch}] train step: {step + 1}/{len(train_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+                )
+                prof.step()
+            # <<< Train <<<
+
+            # >>> Valid >>>
+            model.eval()
+            loss_per_epoch = 0
+
+            for step, batch in enumerate(valid_dataloader):
+                batch = {k: v for k, v in batch.items()}
+                with torch.no_grad():
+                    outputs = model(**batch)
+                loss_per_epoch += outputs.loss
+                logger.info(
+                    f"[epoch {epoch}] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+                )
+                prof.step()
+            # <<< Valid <<<
+
+            logger.info(f"[epoch {epoch}] elapsed time: {time.time() - epoch_time} sec")
+
+    logger.info(f"End training (total elapsed time: {time.time() - start_time} sec)")
+
+else:
+    for epoch in range(args.epoch):
         # >>> Train >>>
         model.train()
         loss_per_epoch = 0
@@ -149,10 +189,6 @@ if accelerator.process_index == 0:
             accelerator.backward(loss)
             optimizer.step()
             optimizer.zero_grad()
-            logger.info(
-                f"[epoch 1] train step: {step + 1}/{len(train_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
-            )
-            prof.step()
         # <<< Train <<<
 
         # >>> Valid >>>
@@ -164,38 +200,4 @@ if accelerator.process_index == 0:
             with torch.no_grad():
                 outputs = model(**batch)
             loss_per_epoch += outputs.loss
-            logger.info(
-                f"[epoch 1] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
-            )
-            prof.step()
         # <<< Valid <<<
-
-        logger.info(f"[epoch 1] elapsed time: {time.time() - epoch_time} sec")
-
-    logger.info(f"End training (total elapsed time: {time.time() - start_time} sec)")
-
-else:
-    # >>> Train >>>
-    model.train()
-    loss_per_epoch = 0
-
-    for step, batch in enumerate(train_dataloader):
-        batch = {k: v for k, v in batch.items()}
-        outputs = model(**batch)
-        loss = outputs.loss
-        loss_per_epoch += loss
-        accelerator.backward(loss)
-        optimizer.step()
-        optimizer.zero_grad()
-    # <<< Train <<<
-
-    # >>> Valid >>>
-    model.eval()
-    loss_per_epoch = 0
-
-    for step, batch in enumerate(valid_dataloader):
-        batch = {k: v for k, v in batch.items()}
-        with torch.no_grad():
-            outputs = model(**batch)
-        loss_per_epoch += outputs.loss
-    # <<< Valid <<<
