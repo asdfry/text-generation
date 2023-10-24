@@ -14,17 +14,25 @@ from metric_collector import MetricCollector
 from accelerate.logging import get_logger
 
 
-# Argparse
+# Argparse (about training)
 parser = argparse.ArgumentParser()
-parser.add_argument("-a", "--aipub", action="store_true")
+parser.add_argument("-a", "--use_aipub", action="store_true")
 parser.add_argument("-b", "--batch_size", type=int, required=True)
 parser.add_argument("-d", "--dataset_size", type=float, default=1.0)
 parser.add_argument("-e", "--epoch", type=int, required=True)
 parser.add_argument("-n", "--num_proc", type=int, default=2)
 parser.add_argument("-o", "--optimizer", type=str, choices=["sgd", "adamw"], default="adamw")
-parser.add_argument("-ml", "--max_length", type=int, choices=[32, 64, 128, 256, 512], default=128)
-parser.add_argument("-mn", "--model_name", type=str, default="LLaMA-2-7B-32K")
+parser.add_argument("-l", "--max_length", type=int, choices=[32, 64, 128, 256, 512], default=128)
+parser.add_argument("-m", "--model_name", type=str, default="LLaMA-2-7B-32K")
+parser.add_argument("-mc", "--use_mc", action="store_true")
 args = parser.parse_args()
+
+
+# Argparse (about metric collector)
+if args.use_mc:
+    parser.add_argument("-mc_p", "--prometheus_ip", type=str, required=True)
+    parser.add_argument("-mc_t", "--target_node_ip", type=str, required=True)
+    args = parser.parse_args()
 
 
 # Instantiate one in an accelerator object
@@ -35,7 +43,7 @@ accelerator = Accelerator()
 if accelerator.process_index == 0:
     start_time = time.time()
 
-    if args.aipub:
+    if args.use_aipub:
         dirpath = f"mnt/output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
     else:
         dirpath = f"output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
@@ -52,18 +60,18 @@ if accelerator.process_index == 0:
     )
     logger = get_logger(__name__)
 
-    mc = MetricCollector(
-        prometheus_ip="http://101.202.0.9:30003",
-        node_address="192.168.10.5:9100",
-        hostname="k8s-node-3",
-        dirpath=dirpath,
-        logger=logger,
-    )
-    mc.start()
+    if args.use_mc:
+        mc = MetricCollector(
+            prometheus_ip=args.prometheus_ip,
+            target_node_ip=args.target_node_ip,
+            dirpath=dirpath,
+            logger=logger,
+        )
+        mc.start()
 
 
 # Prefix
-if args.aipub:
+if args.use_aipub:
     model_path = f"mnt/pretrained-models/{args.model_name}"
     dataset_name = "mnt/tldr_news"
 else:
@@ -197,7 +205,8 @@ if accelerator.process_index == 0:
 
     logger.info(f"End training (total elapsed time: {time.time() - start_time} sec)")
 
-    mc.stop()
+    if args.use_mc:
+        mc.stop()
 
 else:
     for epoch in range(args.epoch):

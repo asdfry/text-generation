@@ -11,16 +11,14 @@ class MetricCollector(Thread):
     def __init__(
         self,
         prometheus_ip: str,
-        node_address: str,
-        hostname: str,
+        target_node_ip: str,
         dirpath: str,
         logger,
     ) -> None:
         super().__init__()
         self.stop_flag = False
-        self.prometheus_url = f"{prometheus_ip}/api/v1/query"
-        self.node_address = node_address
-        self.hostname = hostname
+        self.prometheus_url = f"http://{prometheus_ip}:30003/api/v1/query"
+        self.target_node = f"{target_node_ip}:9100"
         self.dirpath = dirpath
         self.logger = logger
         self.logger.info("Init metric collector")
@@ -36,11 +34,12 @@ class MetricCollector(Thread):
             self.logger.error(f"Failed to query Prometheus. Status code: {response.status_code}")
             return None
 
-    def get_cpu_metrics(self, node_address) -> Dict:
+    def get_cpu_metrics(self) -> Dict:
+        instance = f"{self.target_node}:9100"
         metrics = {}
         queries = {
-            "cpu_util": f'100 - avg(rate(node_cpu_seconds_total{{mode="idle", instance="{node_address}"}}[10s])) * 100',
-            "cpu_mem": f'node_memory_MemTotal_bytes{{instance="{node_address}"}} - node_memory_MemAvailable_bytes{{instance="{node_address}"}}',
+            "cpu_util": f'100 - avg(rate(node_cpu_seconds_total{{mode="idle", instance="{instance}"}}[10s])) * 100',
+            "cpu_mem": f'node_memory_MemTotal_bytes{{instance="{instance}"}} - node_memory_MemAvailable_bytes{{instance="{node_ip}"}}',
         }
 
         for metric, query in queries.items():
@@ -52,13 +51,14 @@ class MetricCollector(Thread):
 
         return metrics
 
-    def get_gpu_metrics(self, hostname) -> Dict:
+    def get_gpu_metrics(self) -> Dict:
+        instance = f"{self.target_node}:9400"
         metrics = {}
         queries = {
-            "util": f'DCGM_FI_DEV_GPU_UTIL{{Hostname="{hostname}"}}',
-            "mem": f'DCGM_FI_DEV_MEM_COPY_UTIL{{Hostname="{hostname}"}}',
-            "power": f'DCGM_FI_DEV_POWER_USAGE{{Hostname="{hostname}"}}',
-            "temp": f'DCGM_FI_DEV_GPU_TEMP{{Hostname="{hostname}"}}',
+            "util": f'DCGM_FI_DEV_GPU_UTIL{{instance="{instance}"}}',
+            "mem": f'DCGM_FI_DEV_MEM_COPY_UTIL{{instance="{instance}"}}',
+            "power": f'DCGM_FI_DEV_POWER_USAGE{{instance="{instance}"}}',
+            "temp": f'DCGM_FI_DEV_GPU_TEMP{{instance="{instance}"}}',
         }
 
         for metric, query in queries.items():
@@ -71,11 +71,12 @@ class MetricCollector(Thread):
 
         return metrics
 
-    def get_disk_metrics(self, node_address) -> Dict:
+    def get_disk_metrics(self) -> Dict:
+        instance = f"{self.target_node}:9100"
         metrics = {}
         queries = {
-            "disk_read": f'rate(node_disk_read_bytes_total{{instance="{node_address}",device="dm-0"}}[10s])',
-            "disk_write": f'rate(node_disk_written_bytes_total{{instance="{node_address}",device="dm-0"}}[10s])',
+            "disk_read": f'rate(node_disk_read_bytes_total{{instance="{instance}",device="dm-0"}}[10s])',
+            "disk_write": f'rate(node_disk_written_bytes_total{{instance="{instance}",device="dm-0"}}[10s])',
         }
 
         for metric, query in queries.items():
@@ -94,9 +95,9 @@ class MetricCollector(Thread):
         while not self.stop_flag:
             row = {"time": datetime.now()}
             start_time = time.time()
-            row.update(self.get_cpu_metrics(self.node_address))
-            row.update(self.get_gpu_metrics(self.hostname))
-            row.update(self.get_disk_metrics(self.node_address))
+            row.update(self.get_cpu_metrics())
+            row.update(self.get_gpu_metrics())
+            row.update(self.get_disk_metrics())
             rows.append(row)
 
             secs = 5 - (time.time() - start_time)
