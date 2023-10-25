@@ -5,23 +5,17 @@ import requests
 from typing import Dict
 from datetime import datetime
 from threading import Thread
+from logger_main import logger
 
 
 class MetricCollector(Thread):
-    def __init__(
-        self,
-        prometheus_ip: str,
-        target_node_ip: str,
-        dirpath: str,
-        logger,
-    ) -> None:
+    def __init__(self, prometheus_ip: str, target_node_ip: str, dirpath: str) -> None:
         super().__init__()
         self.stop_flag = False
         self.prometheus_url = f"http://{prometheus_ip}:30003/api/v1/query"
-        self.target_node = f"{target_node_ip}:9100"
+        self.target_node = f"{target_node_ip}"
         self.dirpath = dirpath
-        self.logger = logger
-        self.logger.info("Init metric collector")
+        logger.info("Init metric collector")
 
     def prometheus_query(self, query) -> dict | None:
         params = {"query": query}
@@ -31,7 +25,7 @@ class MetricCollector(Thread):
             data = response.json()
             return data
         else:
-            self.logger.error(f"Failed to query Prometheus. Status code: {response.status_code}")
+            logger.error(f"Failed to query Prometheus. Status code: {response.status_code}")
             return None
 
     def get_cpu_metrics(self) -> Dict:
@@ -39,7 +33,7 @@ class MetricCollector(Thread):
         metrics = {}
         queries = {
             "cpu_util": f'100 - avg(rate(node_cpu_seconds_total{{mode="idle", instance="{instance}"}}[10s])) * 100',
-            "cpu_mem": f'node_memory_MemTotal_bytes{{instance="{instance}"}} - node_memory_MemAvailable_bytes{{instance="{node_ip}"}}',
+            "cpu_mem": f'node_memory_MemTotal_bytes{{instance="{instance}"}} - node_memory_MemAvailable_bytes{{instance="{instance}"}}',
         }
 
         for metric, query in queries.items():
@@ -89,31 +83,31 @@ class MetricCollector(Thread):
         return metrics
 
     def run(self) -> None:
-        self.logger.info("Start metric collector")
+        logger.info("Start metric collector")
         rows = []
 
         while not self.stop_flag:
-            row = {"time": datetime.now()}
             start_time = time.time()
+            row = {"time": datetime.now()}
             row.update(self.get_cpu_metrics())
             row.update(self.get_gpu_metrics())
             row.update(self.get_disk_metrics())
             rows.append(row)
+            logger.info("Get metrics")
 
             secs = 5 - (time.time() - start_time)
             time.sleep(secs)
 
-        self.logger.info("Stop metric collector")
+        logger.info("Stop metric collector")
 
-        df = pd.DataFrame(rows)
         csv_path = f"{self.dirpath}/metrics.csv"
-        df.to_csv(csv_path, index=False)
-        self.logger.info(f"Save metric.csv (path: {csv_path})")
+        pd.DataFrame(rows).to_csv(csv_path, index=False)
+        logger.info(f"Save metric.csv (path: {csv_path})")
 
         df = pd.read_csv(csv_path)
         for col in df.columns:
             if not col == "time":
-                self.logger.info(
+                logger.info(
                     f"[{col}] min: {df[col].min():.2f}, "
                     f"max: {df[col].max():.2f}, "
                     f"avg: {df[col].mean():.2f}"

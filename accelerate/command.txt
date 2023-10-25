@@ -1,3 +1,3 @@
 python3 create_config.py -s 2 -t 2 -m 101.202.0.9
 source $HPCX_HOME/hpcx-init.sh && hpcx_load
-accelerate launch train.py -b 2 -e 1 -m bloom-560m -mc -mc_p 101.202.0.9 -mc_t 
+accelerate launch --config_file configs/config-2g.yaml train.py -b 64 -e 1 -m TinyStories-33M -mc -mc_p 192.168.10.6 -mc_t 192.168.10.5

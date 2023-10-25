@@ -1,20 +1,19 @@
 import os
 import time
 import torch
-import logging
 import argparse
 
 from datasets import load_from_disk
 from accelerate import Accelerator
+from logger_main import logger, update_config
 from torch.optim import SGD, AdamW
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from torch.profiler import profile, schedule, tensorboard_trace_handler, ProfilerActivity
 from torch.utils.data import DataLoader
 from metric_collector import MetricCollector
-from accelerate.logging import get_logger
 
 
-# Argparse (about training)
+# Argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-a", "--use_aipub", action="store_true")
 parser.add_argument("-b", "--batch_size", type=int, required=True)
@@ -25,14 +24,9 @@ parser.add_argument("-o", "--optimizer", type=str, choices=["sgd", "adamw"], def
 parser.add_argument("-l", "--max_length", type=int, choices=[32, 64, 128, 256, 512], default=128)
 parser.add_argument("-m", "--model_name", type=str, default="LLaMA-2-7B-32K")
 parser.add_argument("-mc", "--use_mc", action="store_true")
+parser.add_argument("-mc_p", "--prometheus_ip", type=str, default=None)
+parser.add_argument("-mc_t", "--target_node_ip", type=str, default=None)
 args = parser.parse_args()
-
-
-# Argparse (about metric collector)
-if args.use_mc:
-    parser.add_argument("-mc_p", "--prometheus_ip", type=str, required=True)
-    parser.add_argument("-mc_t", "--target_node_ip", type=str, required=True)
-    args = parser.parse_args()
 
 
 # Instantiate one in an accelerator object
@@ -47,25 +41,19 @@ if accelerator.process_index == 0:
         dirpath = f"mnt/output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
     else:
         dirpath = f"output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
+
     os.makedirs(dirpath, exist_ok=True)
-
-    filepath = f"{dirpath}/torch.log"
-    if os.path.exists(filepath):
-        os.remove(filepath)
-
-    logging.basicConfig(
-        format="%(asctime)s\t%(levelname)s\t%(message)s",
-        level=logging.INFO,
-        handlers=[logging.FileHandler(filepath), logging.StreamHandler()],
-    )
-    logger = get_logger(__name__)
+    update_config(dirpath)
 
     if args.use_mc:
+        if not args.prometheus_ip or not args.target_node_ip:
+            logger.error("prometheus_ip or target_node_ip is not set")
+            raise Exception("prometheus_ip or target_node_ip is not set")
+
         mc = MetricCollector(
             prometheus_ip=args.prometheus_ip,
             target_node_ip=args.target_node_ip,
             dirpath=dirpath,
-            logger=logger,
         )
         mc.start()
 
@@ -156,9 +144,10 @@ if accelerator.process_index == 0:
         schedule=schedule(wait=1, warmup=1, active=2, repeat=1),
         on_trace_ready=tensorboard_trace_handler(dirpath),
     ) as prof:
+        logger.info(f"Start training")
+
         for epoch in range(args.epoch):
             epoch_time = time.time()
-            logger.info(f"Start training")
 
             # >>> Train >>>
             model.train()
