@@ -2,10 +2,10 @@ import time
 import pandas as pd
 import requests
 
+from utils import logger
 from typing import Dict
 from datetime import datetime
 from threading import Thread
-from logger_main import logger
 
 
 class MetricCollector(Thread):

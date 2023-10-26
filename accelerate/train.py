@@ -3,9 +3,9 @@ import time
 import torch
 import argparse
 
+from utils import logger, update_logger_config, move_nccl_outputs
 from datasets import load_from_disk
 from accelerate import Accelerator
-from logger_main import logger, update_config
 from torch.optim import SGD, AdamW
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from torch.profiler import profile, schedule, tensorboard_trace_handler, ProfilerActivity
@@ -43,7 +43,7 @@ if accelerator.process_index == 0:
         dirpath = f"output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
 
     os.makedirs(dirpath, exist_ok=True)
-    update_config(dirpath)
+    update_logger_config(dirpath)
 
     if args.use_mc:
         if not args.prometheus_ip or not args.target_node_ip:
@@ -142,7 +142,7 @@ if accelerator.process_index == 0:
     with profile(
         activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
         schedule=schedule(wait=1, warmup=1, active=2, repeat=1),
-        on_trace_ready=tensorboard_trace_handler(dirpath),
+        on_trace_ready=tensorboard_trace_handler(dirpath, "master"),
     ) as prof:
         logger.info(f"Start training")
 
@@ -192,6 +192,7 @@ if accelerator.process_index == 0:
             )
             logger.info(f"Save model (path: {dirpath}/epoch-{epoch + 1}/)")
 
+    move_nccl_outputs(dirpath)
     logger.info(f"End training (total elapsed time: {time.time() - start_time} sec)")
 
     if args.use_mc:

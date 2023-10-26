@@ -1,10 +1,11 @@
 import os
 import sys
+import shutil
 
 from loguru import logger
 
 
-def update_config(dirpath):
+def update_logger_config(dirpath):
     filepath = f"{dirpath}/torch.log"
     if os.path.exists(filepath):
         os.remove(filepath)
@@ -22,3 +23,7 @@ def update_config(dirpath):
         ]
     }
     logger.configure(**config)
+
+def move_nccl_outputs(dirpath):
+    shutil.move(os.getenv("NCCL_DEBUG_FILE"), f"{dirpath}/nccl-debug.log")
+    shutil.move(os.getenv("NCCL_TOPO_DUMP_FILE"), f"{dirpath}/nccl-topo.xml")
