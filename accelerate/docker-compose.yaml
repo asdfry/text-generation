@@ -7,4 +7,6 @@ services:
       - ./output:/root/output
     command: ["/bin/bash", "-c", "/usr/sbin/sshd -p 1041 && sleep infinity"]
     ports:
+      - 1040:1040
       - 1041:1041
+    shm_size: 256M
