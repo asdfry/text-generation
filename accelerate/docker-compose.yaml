@@ -10,3 +10,4 @@ services:
       - 1040:1040
       - 1041:1041
     shm_size: 256M
+    network_mode: host
