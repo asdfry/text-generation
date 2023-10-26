@@ -1,0 +1,10 @@
+services:
+  trainer:
+    image: asdfry/train-llm:20231026
+    runtime: nvidia
+    volumes:
+      - ./pretrained-models:/root/pretrained-models
+      - ./output:/root/output
+    command: ["/bin/bash", "-c", "/usr/sbin/sshd -p 1041 && sleep infinity"]
+    ports:
+      - 1041:1041
