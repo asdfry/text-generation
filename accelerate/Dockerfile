@@ -53,12 +53,12 @@ RUN apt-get install -y curl python3.10-dev python3.10-distutils && \
 
 # Copy files that required for training
 COPY train.py train.py
+COPY utils.py utils.py
 COPY tldr_news tldr_news
 COPY command.txt command.txt
-COPY logger_main.py logger_main.py
 COPY create_config.py create_config.py
 COPY metric_collector.py metric_collector.py
 
 # For util
 RUN echo "alias n='nvitop --colorful'" >> ~/.bashrc
-COPY config_hm.yaml config_hm.yaml
+COPY configs configs
