@@ -17,12 +17,13 @@ from metric_collector import MetricCollector
 parser = argparse.ArgumentParser()
 parser.add_argument("-a", "--use_aipub", action="store_true")
 parser.add_argument("-b", "--batch_size", type=int, required=True)
-parser.add_argument("-d", "--dataset_size", type=float, default=1.0)
-parser.add_argument("-e", "--epoch", type=int, required=True)
+parser.add_argument("-ds", "--dataset_size", type=float, default=1.0)
+parser.add_argument("-dn", "--dataset_name", type=str, default="tldr", choices=["tldr", "redp"])
+parser.add_argument("-e", "--epoch", type=int, default=1)
 parser.add_argument("-n", "--num_proc", type=int, default=2)
 parser.add_argument("-o", "--optimizer", type=str, choices=["sgd", "adamw"], default="adamw")
 parser.add_argument("-l", "--max_length", type=int, choices=[32, 64, 128, 256, 512], default=128)
-parser.add_argument("-m", "--model_name", type=str, default="LLaMA-2-7B-32K")
+parser.add_argument("-m", "--model_name", type=str, default="bloom-560m")
 parser.add_argument("-mc", "--use_mc", action="store_true")
 parser.add_argument("-mc_p", "--prometheus_ip", type=str, default=None)
 parser.add_argument("-mc_t", "--target_node_ip", type=str, default=None)
@@ -59,16 +60,21 @@ if accelerator.process_index == 0:
 
 
 # Prefix
+model_path = f"pretrained-models/{args.model_name}"
+if args.dataset_name == "tldr":
+    dataset_path = "datasets/tldr_news"
+    column = "content"
+elif args.dataset_name == "redp":
+    dataset_path = "datasets/RedPajama-Data-V2"
+    column = "raw_content"
+
 if args.use_aipub:
-    model_path = f"mnt/pretrained-models/{args.model_name}"
-    dataset_name = "mnt/tldr_news"
-else:
-    model_path = f"pretrained-models/{args.model_name}"
-    dataset_name = "tldr_news"
+    model_path = f"mnt/{model_path}"
+    dataset_path = f"mnt/{dataset_path}"
 
 
 # Create dataset
-datasets = load_from_disk(dataset_name)
+datasets = load_from_disk(dataset_path)
 
 
 # Load tokenizer
@@ -77,7 +83,7 @@ tokenizer.pad_token = tokenizer.eos_token
 
 
 def tokenize_function(examples):
-    result = tokenizer(examples["content"], max_length=args.max_length, truncation=True, padding="max_length")
+    result = tokenizer(examples[column], max_length=args.max_length, truncation=True, padding="max_length")
     result["labels"] = result["input_ids"].copy()
     return result
 
@@ -89,7 +95,7 @@ tokenized_datasets = datasets.map(
     tokenize_function,
     batched=True,
     num_proc=args.num_proc,
-    load_from_cache_file=False,
+    # load_from_cache_file=False,
     remove_columns=datasets["train"].column_names,  # remove columns that are not required for model input
 )
 tokenized_datasets.set_format("torch")
@@ -101,18 +107,18 @@ train_dataset = (
     .shuffle(seed=77)
     .select(range(int(tokenized_datasets["train"].num_rows * args.dataset_size)))
 )
-valid_dataset = (
-    tokenized_datasets["test"]
-    .shuffle(seed=77)
-    .select(range(int(tokenized_datasets["test"].num_rows * args.dataset_size)))
-)
+# valid_dataset = (
+#     tokenized_datasets["test"]
+#     .shuffle(seed=77)
+#     .select(range(int(tokenized_datasets["test"].num_rows * args.dataset_size)))
+# )
 
 if accelerator.process_index == 0:
     logger.info(f"Train dataset size: {len(train_dataset)}")
-    logger.info(f"Valid dataset size: {len(valid_dataset)}")
+    # logger.info(f"Valid dataset size: {len(valid_dataset)}")
 
 train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=args.batch_size)
-valid_dataloader = DataLoader(valid_dataset, batch_size=args.batch_size)
+# valid_dataloader = DataLoader(valid_dataset, batch_size=args.batch_size)
 
 
 # Load model
@@ -129,11 +135,11 @@ elif args.optimizer == "adamw":
 
 
 # Ready for training with accelerate
-model, optimizer, train_dataloader, valid_dataloader = accelerator.prepare(
+model, optimizer, train_dataloader = accelerator.prepare(
     model,
     optimizer,
     train_dataloader,
-    valid_dataloader,
+    # valid_dataloader,
 )
 
 
@@ -168,18 +174,18 @@ if accelerator.process_index == 0:
             # <<< Train <<<
 
             # >>> Valid >>>
-            model.eval()
-            loss_per_epoch = 0
+            # model.eval()
+            # loss_per_epoch = 0
 
-            for step, batch in enumerate(valid_dataloader):
-                batch = {k: v for k, v in batch.items()}
-                with torch.no_grad():
-                    outputs = model(**batch)
-                loss_per_epoch += outputs.loss
-                logger.info(
-                    f"[epoch {epoch + 1}] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
-                )
-                prof.step()
+            # for step, batch in enumerate(valid_dataloader):
+            #     batch = {k: v for k, v in batch.items()}
+            #     with torch.no_grad():
+            #         outputs = model(**batch)
+            #     loss_per_epoch += outputs.loss
+            #     logger.info(
+            #         f"[epoch {epoch + 1}] valid step: {step + 1}/{len(valid_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+            #     )
+            #     prof.step()
             # <<< Valid <<<
 
             logger.info(f"[epoch {epoch + 1}] elapsed time: {time.time() - epoch_time} sec")
@@ -215,12 +221,12 @@ else:
         # <<< Train <<<
 
         # >>> Valid >>>
-        model.eval()
-        loss_per_epoch = 0
+        # model.eval()
+        # loss_per_epoch = 0
 
-        for step, batch in enumerate(valid_dataloader):
-            batch = {k: v for k, v in batch.items()}
-            with torch.no_grad():
-                outputs = model(**batch)
-            loss_per_epoch += outputs.loss
+        # for step, batch in enumerate(valid_dataloader):
+        #     batch = {k: v for k, v in batch.items()}
+        #     with torch.no_grad():
+        #         outputs = model(**batch)
+        #     loss_per_epoch += outputs.loss
         # <<< Valid <<<

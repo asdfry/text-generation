@@ -159,7 +159,8 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 .vscode/
-tldr_news
+logs/
+datasets/
 pretrained-models/
 output/
 *.jsonl
@@ -169,3 +170,4 @@ hpcx-v2.16-gcc-mlnx_ofed-ubuntu22.04-cuda12-gdrcopy2-nccl2.18-x86_64
 MLNX_OFED_LINUX-5.8-3.0.7.0-ubuntu22.04-x86_64
 nccl-*.xml
 .deepspeed_env
+2023.10.17/
