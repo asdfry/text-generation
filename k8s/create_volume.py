@@ -37,23 +37,25 @@ def create_persistent_volume_claim(name: str, access_mode: str, storage_size: in
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-l", "--log_dir_path", type=str, required=True)
-    parser.add_argument("-m", "--model_dir_path", type=str, required=True)
+    parser.add_argument("-v", "--storage_size", type=str, default=500)
+    parser.add_argument("-v", "--volume_path", type=str, required=True)
     args = parser.parse_args()
 
     config.load_kube_config()
     v1 = client.CoreV1Api()
 
     namespace = "common"
-
-    # create pv, pvc for pretrained-models
-    name = "jsh-pretrained-models"
+    name = "jsh"
     access_mode = "ReadOnlyMany"
-    create_persistent_volume(name=name, access_mode=access_mode, storage_size=500, host_path= args.model_dir_path)
-    create_persistent_volume_claim(name=name, access_mode=access_mode, storage_size=500)
 
-    # create pv, pvc for logs
-    name = "jsh-logs"
-    access_mode = "ReadWriteMany"
-    create_persistent_volume(name=name, access_mode=access_mode, storage_size=50, host_path= args.log_dir_path)
-    create_persistent_volume_claim(name=name, access_mode=access_mode, storage_size=50)
+    create_persistent_volume(
+        name=name,
+        access_mode=access_mode,
+        storage_size=args.storage_size,
+        host_path=args.volume_path,
+    )
+    create_persistent_volume_claim(
+        name=name,
+        access_mode=access_mode,
+        storage_size=args.storage_size,
+    )

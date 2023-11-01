@@ -1,7 +1,6 @@
 python deploy.py \
--i asdfry/train-llm:20231017 \
+-i asdfry/train-llm:20231031 \
 -s 8 \
--lp /data/jsh/logs \
--mp /data/jsh/pretrained-models \
+-v volume_path \
 -gm ten1010.io/gpu-nvidia-a100-pcie-80gb \
 -gw ten1010.io/gpu-nvidia-a100-pcie-80gb

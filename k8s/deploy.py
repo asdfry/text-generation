@@ -21,8 +21,7 @@ def create_pod(name: str, hostname: str, gpu: str):
                     "image": f"{args.image_name}",
                     # "imagePullPolicy": "Always",
                     "volumeMounts": [
-                        {"name": "logs", "mountPath": "/root/logs"},
-                        {"name": "pretrained-models", "mountPath": "/root/pretrained-models"},
+                        {"name": "volume", "mountPath": "/root/mnt"},
                         {"name": "shmdir", "mountPath": "/dev/shm"},
                     ],
                     "command": [
@@ -36,16 +35,11 @@ def create_pod(name: str, hostname: str, gpu: str):
                 },
             ],
             # "volumes": [
-            #     {"name": "logs", "persistentVolumeClaim": {"claimName": "jsh-logs-pvc"}},
-            #     {"name": "pretrained-models", "persistentVolumeClaim": {"claimName": "jsh-pretrained-models-pvc"}},
+            #     {"name": "volume", "persistentVolumeClaim": {"claimName": "jsh-pvc"}},
             #     {"name": "shmdir", "emptyDir": {"medium": "Memory", "sizeLimit": "256M"}},
             # ],
             "volumes": [
-                {"name": "logs", "hostPath": {"path": f"{args.log_dir_path}", "type": "Directory"}},
-                {
-                    "name": "pretrained-models",
-                    "hostPath": {"path": f"{args.model_dir_path}", "type": "Directory"},
-                },
+                {"name": "volume", "hostPath": {"path": f"{args.volume_path}", "type": "Directory"}},
                 {"name": "shmdir", "emptyDir": {"medium": "Memory", "sizeLimit": "256M"}},
             ],
         },
@@ -58,8 +52,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--image_name", type=str, required=True)
     parser.add_argument("-s", "--slot_size", type=int, required=True)
-    parser.add_argument("-lp", "--log_dir_path", type=str, required=True)
-    parser.add_argument("-mp", "--model_dir_path", type=str, required=True)
+    parser.add_argument("-v", "--volume_path", type=str, required=True)
     parser.add_argument("-gm", "--gpu_master", type=str, required=True)
     parser.add_argument("-gw", "--gpu_worker", type=str, required=True)
     args = parser.parse_args()
