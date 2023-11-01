@@ -157,18 +157,26 @@ if accelerator.process_index == 0:
 
             # >>> Train >>>
             model.train()
-            loss_per_epoch = 0
+            total_loss = 0
 
             for step, batch in enumerate(train_dataloader):
                 batch = {k: v for k, v in batch.items()}
                 outputs = model(**batch)
                 loss = outputs.loss
-                loss_per_epoch += loss
                 accelerator.backward(loss)
                 optimizer.step()
                 optimizer.zero_grad()
+
+                total_loss += loss
+                avg_loss = total_loss / (step + 1)
+                ppl = torch.exp(avg_loss)
+                length = len(str(len(train_dataloader)))
+
                 logger.info(
-                    f"[epoch {epoch + 1}] train step: {step + 1}/{len(train_dataloader)}, loss: {loss_per_epoch / (step + 1)}"
+                    f"[epoch {epoch + 1}] "
+                    f"step: {step + 1:>{length}}/{len(train_dataloader)}   "
+                    f"loss: {avg_loss:<18}   "
+                    f"perplexity: {ppl:<18}"
                 )
                 prof.step()
             # <<< Train <<<
@@ -196,7 +204,7 @@ if accelerator.process_index == 0:
                 is_main_process=accelerator.is_main_process,
                 save_function=accelerator.save,
             )
-            logger.info(f"Save model (path: {dirpath}/epoch-{epoch + 1}/)")
+            logger.info(f"[epoch {epoch + 1}] model path: {dirpath}/epoch-{epoch + 1}/")
 
     move_nccl_outputs(dirpath)
     logger.info(f"End training (total elapsed time: {time.time() - start_time} sec)")
