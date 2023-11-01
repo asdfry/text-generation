@@ -66,6 +66,6 @@ if __name__ == "__main__":
 
     for idx, hostname in enumerate(lines):
         if idx == 0:
-            create_pod("master", hostname.strip(), args.gpu_master)
+            create_pod(f"trainer-{idx+1}", hostname.strip(), args.gpu_master)
         else:
-            create_pod(f"worker-{idx}", hostname.strip(), args.gpu_worker)
+            create_pod(f"trainer-{idx+1}", hostname.strip(), args.gpu_worker)
