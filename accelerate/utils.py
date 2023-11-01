@@ -25,5 +25,8 @@ def update_logger_config(dirpath):
     logger.configure(**config)
 
 def move_nccl_outputs(dirpath):
-    shutil.move(os.getenv("NCCL_DEBUG_FILE"), f"{dirpath}/nccl-debug.log")
-    shutil.move(os.getenv("NCCL_TOPO_DUMP_FILE"), f"{dirpath}/nccl-topo.xml")
+    try:
+        shutil.move(os.getenv("NCCL_DEBUG_FILE"), f"{dirpath}/nccl-debug.log")
+        shutil.move(os.getenv("NCCL_TOPO_DUMP_FILE"), f"{dirpath}/nccl-topo.xml")
+    except:
+        pass
