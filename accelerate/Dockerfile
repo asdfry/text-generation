@@ -58,10 +58,12 @@ COPY command.txt command.txt
 COPY create_config.py create_config.py
 COPY metric_collector.py metric_collector.py
 
-# For util (aipub)
-RUN echo "alias n='nvitop --colorful'" >> ~/.bashrc && \
-    echo "export NCCL_DEBUG='INFO'" >> ~/.bashrc && \
-    echo "export NCCL_DEBUG_FILE='output/nccl-debug.log'" >> ~/.bashrc && \
-    echo "export NCCL_TOPO_DUMP_FILE='output/nccl-topo.xml'" >> ~/.bashrc && \
-    echo "export HPCX_HOME='/usr/local/hpcx-v2.16-gcc-mlnx_ofed-ubuntu22.04-cuda12-gdrcopy2-nccl2.18-x86_64'" >> ~/.bashrc
+# For util
+RUN echo "alias n='nvitop --colorful'" >> ~/.bashrc
 COPY configs configs
+
+# For aipub
+# RUN echo "export NCCL_DEBUG='INFO'" >> ~/.bashrc && \
+#     echo "export NCCL_DEBUG_FILE='mnt/output/nccl-debug.log'" >> ~/.bashrc && \
+#     echo "export NCCL_TOPO_DUMP_FILE='mnt/output/nccl-topo.xml'" >> ~/.bashrc && \
+#     echo "export HPCX_HOME='/usr/local/hpcx-v2.16-gcc-mlnx_ofed-ubuntu22.04-cuda12-gdrcopy2-nccl2.18-x86_64'" >> ~/.bashrc
