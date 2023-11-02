@@ -37,7 +37,7 @@ def write_accelerate_config(master_addr: str, slot_size: int, total_node: int):
             f"main_process_ip: {master_addr}\n"
             f"main_process_port: 1040\n"
             f"main_training_function: main\n"
-            f"mixed_precision: 'fp16'\n"
+            f"mixed_precision: 'no'\n"
             f"num_machines: {total_node}\n"
             f"num_processes: {slot_size * total_node}\n"
             f"rdzv_backend: static\n"
