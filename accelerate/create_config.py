@@ -29,7 +29,7 @@ def write_accelerate_config(master_addr: str, slot_size: int, total_node: int):
             f"  offload_optimizer_device: cpu\n"
             f"  offload_param_device: cpu\n"
             f"  zero3_init_flag: true\n"
-            f"  zero3_save_16bit_model: true"
+            f"  zero3_save_16bit_model: true\n"
             f"  zero_stage: 3\n"
             f"distributed_type: DEEPSPEED\n"
             f"downcast_bf16: 'no'\n"
