@@ -62,10 +62,10 @@ if __name__ == "__main__":
     namespace = "common"
 
     with open("pods", "r") as f:
-        lines = f.readlines()
+        lines = [i.strip() for i in f.readlines() if i]
 
     for idx, hostname in enumerate(lines):
         if idx == 0:
-            create_pod(f"trainer-{idx+1}", hostname.strip(), args.gpu_master)
+            create_pod(f"trainer-{idx+1}", hostname, args.gpu_master)
         else:
-            create_pod(f"trainer-{idx+1}", hostname.strip(), args.gpu_worker)
+            create_pod(f"trainer-{idx+1}", hostname, args.gpu_worker)
