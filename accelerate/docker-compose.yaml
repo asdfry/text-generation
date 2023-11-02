@@ -1,14 +1,15 @@
 services:
   trainer:
-    image: asdfry/train-llm:20231026
+    image: asdfry/train-llm:20231102
     runtime: nvidia
     volumes:
+      - ./datasets:/root/datasets
       - ./pretrained-models:/root/pretrained-models
       - ./output:/root/output
     command: ["/bin/bash", "-c", "/usr/sbin/sshd -p 1041 && sleep infinity"]
     ports:
       - 1040:1040
       - 1041:1041
-    shm_size: 256M
+    shm_size: 1GB
     network_mode: host
     privileged: true
