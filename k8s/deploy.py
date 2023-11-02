@@ -40,7 +40,7 @@ def create_pod(name: str, hostname: str, gpu: str):
             # ],
             "volumes": [
                 {"name": "volume", "hostPath": {"path": f"{args.volume_path}", "type": "Directory"}},
-                {"name": "shmdir", "emptyDir": {"medium": "Memory", "sizeLimit": "256M"}},
+                {"name": "shmdir", "emptyDir": {"medium": "Memory", "sizeLimit": "1Gi"}},
             ],
         },
     }
