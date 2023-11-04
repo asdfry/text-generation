@@ -8,3 +8,4 @@ nvitop==1.1.2
 sentencepiece==0.1.99
 protobuf==4.24.0
 loguru==0.7.2
+requests==2.31.0

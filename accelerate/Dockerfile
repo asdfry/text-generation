@@ -31,8 +31,8 @@ RUN ./MLNX_OFED_LINUX-5.8-3.0.7.0-ubuntu22.04-x86_64/mlnxofedinstall --user-spac
 
 # Install nccl
 ENV NCCL_DEBUG=INFO
-ENV NCCL_DEBUG_FILE=output/nccl-debug.log
-ENV NCCL_TOPO_DUMP_FILE=output/nccl-topo.xml
+ENV NCCL_DEBUG_FILE=mnt/output/nccl-debug.%p.log
+ENV NCCL_TOPO_DUMP_FILE=mnt/output/nccl-topo.%p.xml
 RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb && \
     dpkg -i cuda-keyring_1.0-1_all.deb && \
     apt-get update && \
@@ -64,6 +64,6 @@ COPY configs configs
 
 # For aipub
 # RUN echo "export NCCL_DEBUG='INFO'" >> ~/.bashrc && \
-#     echo "export NCCL_DEBUG_FILE='mnt/output/nccl-debug.log'" >> ~/.bashrc && \
-#     echo "export NCCL_TOPO_DUMP_FILE='mnt/output/nccl-topo.xml'" >> ~/.bashrc && \
+#     echo "export NCCL_DEBUG_FILE='mnt/output/nccl-debug.%p.log'" >> ~/.bashrc && \
+#     echo "export NCCL_TOPO_DUMP_FILE='mnt/output/nccl-topo.%p.xml'" >> ~/.bashrc && \
 #     echo "export HPCX_HOME='/usr/local/hpcx-v2.16-gcc-mlnx_ofed-ubuntu22.04-cuda12-gdrcopy2-nccl2.18-x86_64'" >> ~/.bashrc

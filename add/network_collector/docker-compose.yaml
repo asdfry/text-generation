@@ -1,0 +1,10 @@
+services:
+  network-collector:
+    image: asdfry/python:nc
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /gpfs:/root/mnt
+    command: ["/bin/bash", "-c", "sleep infinity"]
+    network_mode: host
