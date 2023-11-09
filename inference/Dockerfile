@@ -19,5 +19,4 @@ RUN apt-get update && \
 
 # Copy files that required for training
 COPY main.py main.py
-COPY utils.py utils.py
 COPY models.py models.py
