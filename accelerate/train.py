@@ -15,15 +15,14 @@ from metric_collector import MetricCollector
 
 # Argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("-a", "--use_aipub", action="store_true")
 parser.add_argument("-b", "--batch_size", type=int, required=True)
 parser.add_argument("-ds", "--dataset_size", type=float, default=1.0)
 parser.add_argument("-dn", "--dataset_name", type=str, default="tldr", choices=["tldr", "redp"])
 parser.add_argument("-e", "--epoch", type=int, default=1)
-parser.add_argument("-n", "--num_proc", type=int, default=2)
-parser.add_argument("-o", "--optimizer", type=str, choices=["sgd", "adamw"], default="adamw")
 parser.add_argument("-l", "--max_length", type=int, choices=[32, 64, 128, 256, 512], default=128)
 parser.add_argument("-m", "--model_name", type=str, default="bloom-560m")
+parser.add_argument("-n", "--num_proc", type=int, default=2)
+parser.add_argument("-o", "--optimizer", type=str, choices=["sgd", "adamw"], default="adamw")
 parser.add_argument("-mc", "--use_mc", action="store_true")
 parser.add_argument("-mc_p", "--prometheus_ip", type=str, default=None)
 parser.add_argument("-mc_t", "--target_node_ip", type=str, default=None)
@@ -37,12 +36,7 @@ accelerator = Accelerator()
 # Set logger & Start metric collector
 if accelerator.process_index == 0:
     start_time = time.time()
-
-    if args.use_aipub:
-        dirpath = f"mnt/output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
-    else:
-        dirpath = f"output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
-
+    dirpath = f"mnt/output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
     os.makedirs(dirpath, exist_ok=True)
     update_logger_config(dirpath)
 
@@ -59,18 +53,17 @@ if accelerator.process_index == 0:
         mc.start()
 
 
-# Prefix
-model_path = f"pretrained-models/{args.model_name}"
+# Set model
+model_path = f"mnt/pretrained-models/{args.model_name}"
+
+
+# Set dataset
 if args.dataset_name == "tldr":
-    dataset_path = "datasets/tldr_news"
+    dataset_path = "mnt/datasets/tldr_news"
     column = "content"
 elif args.dataset_name == "redp":
-    dataset_path = "datasets/RedPajama-Data-V2"
+    dataset_path = "mnt/datasets/RedPajama-Data-V2"
     column = "raw_content"
-
-if args.use_aipub:
-    model_path = f"mnt/{model_path}"
-    dataset_path = f"mnt/{dataset_path}"
 
 
 # Create dataset
