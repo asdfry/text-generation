@@ -11,4 +11,5 @@ services:
     ports:
       - 1047:8000
     environment:
+      - DTYPE=fp32
       - MODEL_NAME=Llama-2-7b-chat-hf

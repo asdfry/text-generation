@@ -14,12 +14,17 @@ model = {}
 
 @asynccontextmanager
 async def load_model(app: FastAPI):
+    if os.environ["DTYPE"] == "fp16":
+        dytpe = torch.float16
+    else:
+        dytpe = torch.float32
+
     model_path = f"mnt/pretrained-models/{os.environ['MODEL_NAME']}"
     model["tokenizer"] = AutoTokenizer.from_pretrained(model_path)
     model["model"] = AutoModelForCausalLM.from_pretrained(
         model_path,
         device_map="auto",
-        torch_dtype=torch.float16,
+        torch_dtype=dytpe,
         trust_remote_code=True,
     )
     yield
