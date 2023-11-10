@@ -6,6 +6,7 @@ class Infer(BaseModel):
     top_k: Annotated[int, "Top-k"] = 50
     top_p: Annotated[float, "Top-p"] = 0.92
     sentence: Annotated[str, "Sentence to inference"]
+    do_sample: Annotated[bool, "Whether to do sample"] = True
     min_length: Annotated[int, "Minimum length of the sequence to be generated"] = 20
     max_length: Annotated[int, "Maximum length of the sequence to be generated"] = 200
     temperature: Annotated[float, "Temperature"] = 0.9

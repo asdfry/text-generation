@@ -42,9 +42,9 @@ def generate_text_large(item: Infer):
 
     outputs = model["model"].generate(
         **inputs,
-        do_sample=True,
         top_k=item["top_k"],
         top_p=item["top_p"],
+        do_sample=item["do_sample"],
         min_length=item["min_length"],
         max_length=item["max_length"],
         temperature=item["temperature"],
