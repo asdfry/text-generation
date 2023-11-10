@@ -3,7 +3,7 @@ version: "3.6"
 services:
 
   api:
-    image: asdfry/infer-llm:20231109
+    image: asdfry/infer-llm:20231110
     runtime: nvidia
     volumes:
       - /gpfs/jsh:/root/mnt:ro
