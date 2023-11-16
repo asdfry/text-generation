@@ -234,7 +234,11 @@ if accelerator.process_index == 0:
                 is_main_process=accelerator.is_main_process,
                 save_function=accelerator.save,
             )
-            logger.info(f"[epoch {epoch + 1}] model path: {dirpath}/epoch-{epoch + 1}/")
+            real_io, last_io = get_io(last_io, args.logging_ethernet, args.logging_rdma)
+            logger.info(
+                f"[epoch {epoch + 1}] model path: {dirpath}/epoch-{epoch + 1}/ "
+                f"(rcv: {real_io['rcv']}, xmit: {real_io['xmit']})"
+            )
 
     logger.info(f"End training (total elapsed time: {time.time() - start_time} sec)")
 
