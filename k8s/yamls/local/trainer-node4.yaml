@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    ten1010.io/creator-name: jsh
+  name: trainer-node4
+  # namespace: common
+spec:
+  volumes:
+  - name: jsh
+    hostPath:
+      path: /home/jsh/volume
+      type: Directory
+  - name: shmdir
+    emptyDir:
+      medium: Memory
+      sizeLimit: 1Gi
+  containers:
+  - command:
+    - /bin/bash
+    - -c
+    - /usr/sbin/sshd -p 1041 && sleep infinity
+    image: asdfry/train-llm:20231116
+    name: app
+    ports:
+    - containerPort: 1041
+      hostPort: 1041
+      protocol: TCP
+    resources:
+      limits:
+        ten1010.io/gpu-nvidia-a100-sxm4-80gb: "4"
+      requests:
+        ten1010.io/gpu-nvidia-a100-sxm4-80gb: "4"
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - name: jsh
+      mountPath: /root/mnt
+    - name: shmdir
+      mountPath: /dev/shm
+  hostNetwork: true
+  nodeSelector:
+    kubernetes.io/hostname: pnode4.idc1.ten1010.io
