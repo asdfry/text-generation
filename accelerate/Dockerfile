@@ -51,6 +51,10 @@ RUN apt-get install -y curl python3.10-dev python3.10-distutils && \
     pip install --no-cache-dir -r requirements.txt && \
     pip install deepspeed==0.10.3
 
+# Install git lfs
+RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
+    apt-get install git-lfs
+
 # Copy files that required for training
 COPY train.py train.py
 COPY utils.py utils.py
