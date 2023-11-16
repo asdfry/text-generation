@@ -3,7 +3,7 @@ import time
 import torch
 import argparse
 
-from utils import logger, update_logger_config, move_nccl_outputs
+from utils import logger, update_logger_config, move_nccl_outputs, set_dataset, get_io
 from datasets import load_from_disk
 from accelerate import Accelerator
 from torch.optim import SGD, AdamW
@@ -15,7 +15,9 @@ from metric_collector import MetricCollector
 
 # Argparse
 parser = argparse.ArgumentParser()
+
 parser.add_argument("-b", "--batch_size", type=int, required=True)
+parser.add_argument("-c", "--custom_name", type=str, default=None)
 parser.add_argument("-ds", "--dataset_size", type=float, default=1.0)
 parser.add_argument("-dn", "--dataset_name", type=str, default="tldr", choices=["tldr", "redp"])
 parser.add_argument("-e", "--epoch", type=int, default=1)
@@ -23,9 +25,14 @@ parser.add_argument("-l", "--max_length", type=int, choices=[32, 64, 128, 256, 5
 parser.add_argument("-m", "--model_name", type=str, default="bloom-560m")
 parser.add_argument("-n", "--num_proc", type=int, default=2)
 parser.add_argument("-o", "--optimizer", type=str, choices=["sgd", "adamw"], default="adamw")
+
+parser.add_argument("-le", "--logging_ethernet", type=str, default=None)
+parser.add_argument("-lr", "--logging_rdma", type=str, default=None)
+
 parser.add_argument("-mc", "--use_mc", action="store_true")
 parser.add_argument("-mc_p", "--prometheus_ip", type=str, default=None)
 parser.add_argument("-mc_t", "--target_node_ip", type=str, default=None)
+
 args = parser.parse_args()
 
 
@@ -36,9 +43,15 @@ accelerator = Accelerator()
 # Set logger & Start metric collector
 if accelerator.process_index == 0:
     start_time = time.time()
-    dirpath = f"mnt/output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
+
+    if args.custom_name:
+        dirpath = f"mnt/output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}-{args.custom_name}"
+    else:
+        dirpath = f"mnt/output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
+
     os.makedirs(dirpath, exist_ok=True)
     update_logger_config(dirpath)
+    move_nccl_outputs(dirpath)
 
     if args.use_mc:
         if not args.prometheus_ip or not args.target_node_ip:
@@ -53,30 +66,40 @@ if accelerator.process_index == 0:
         mc.start()
 
 
-# Set model
+# Set model, dataset
 model_path = f"mnt/pretrained-models/{args.model_name}"
+dataset_path, column_name = set_dataset(args.dataset_name)
 
 
-# Set dataset
-if args.dataset_name == "tldr":
-    dataset_path = "mnt/datasets/tldr_news"
-    column = "content"
-elif args.dataset_name == "redp":
-    dataset_path = "mnt/datasets/RedPajama-Data-V2"
-    column = "raw_content"
+# Check first counter
+if accelerator.process_index == 0:
+    last_io = {"rcv": 0, "xmit": 0}
+    _, last_io = get_io(last_io, args.logging_ethernet, args.logging_rdma)
 
 
 # Create dataset
+if accelerator.process_index == 0:
+    logger.info(f"Start loading dataset: {dataset_path}")
+
 datasets = load_from_disk(dataset_path)
+
+if accelerator.process_index == 0:
+    real_io, last_io = get_io(last_io, args.logging_ethernet, args.logging_rdma)
+    logger.info(f"End loading dataset: {dataset_path} (rcv: {real_io['rcv']}, xmit: {real_io['xmit']})")
 
 
 # Load tokenizer
+if accelerator.process_index == 0:
+    logger.info(f"Start tokenizing dataset")
+
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 tokenizer.pad_token = tokenizer.eos_token
 
 
 def tokenize_function(examples):
-    result = tokenizer(examples[column], max_length=args.max_length, truncation=True, padding="max_length")
+    result = tokenizer(
+        examples[column_name], max_length=args.max_length, truncation=True, padding="max_length"
+    )
     result["labels"] = result["input_ids"].copy()
     return result
 
@@ -88,10 +111,14 @@ tokenized_datasets = datasets.map(
     tokenize_function,
     batched=True,
     num_proc=args.num_proc,
-    # load_from_cache_file=False,
     remove_columns=datasets["train"].column_names,  # remove columns that are not required for model input
 )
 tokenized_datasets.set_format("torch")
+
+if accelerator.process_index == 0:
+    real_io, last_io = get_io(last_io, args.logging_ethernet, args.logging_rdma)
+    logger.info(f"End tokenizing dataset (rcv: {real_io['rcv']}, xmit: {real_io['xmit']})")
+    # logger.info(f"Valid dataset size: {len(valid_dataset)}")
 
 
 # Create dataloader
@@ -116,8 +143,13 @@ train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=args.batch
 
 # Load model
 if accelerator.process_index == 0:
-    logger.info(f"Model: {args.model_name}")
+    logger.info(f"Start loading model: {args.model_name}")
+
 model = AutoModelForCausalLM.from_pretrained(model_path)
+
+if accelerator.process_index == 0:
+    real_io, last_io = get_io(last_io, args.logging_ethernet, args.logging_rdma)
+    logger.info(f"End loading model: {args.model_name} (rcv: {real_io['rcv']}, xmit: {real_io['xmit']})")
 
 
 # Set optimizer
@@ -164,13 +196,18 @@ if accelerator.process_index == 0:
                 avg_loss = total_loss / (step + 1)
                 ppl = torch.exp(avg_loss)
                 length = len(str(len(train_dataloader)))
+                real_io, last_io = get_io(last_io, args.logging_ethernet, args.logging_rdma)
 
-                logger.info(
+                log_content = (
                     f"[epoch {epoch + 1}] "
                     f"step: {step + 1:>{length}}/{len(train_dataloader)}   "
                     f"loss: {avg_loss:<18}   "
-                    f"perplexity: {ppl:<18}"
+                    f"perplexity: {ppl:<18} "
+                    f"rcv: {real_io['rcv']:<8}  "
+                    f"xmit: {real_io['xmit']:<8}  "
                 )
+
+                logger.info(log_content)
                 prof.step()
             # <<< Train <<<
 
@@ -199,7 +236,6 @@ if accelerator.process_index == 0:
             )
             logger.info(f"[epoch {epoch + 1}] model path: {dirpath}/epoch-{epoch + 1}/")
 
-    move_nccl_outputs(dirpath)
     logger.info(f"End training (total elapsed time: {time.time() - start_time} sec)")
 
     if args.use_mc:

@@ -17,7 +17,7 @@ ENV HF_DATASETS_OFFLINE=1
 
 # Install packages
 RUN apt-get update && \
-    apt-get install -y pdsh vim openssh-server net-tools libnvidia-compute-515 && \
+    apt-get install -y pdsh vim openssh-server net-tools git tmux libnvidia-compute-515 && \
     mkdir -p /var/run/sshd
 
 # Set for ssh
@@ -31,8 +31,8 @@ RUN ./MLNX_OFED_LINUX-5.8-3.0.7.0-ubuntu22.04-x86_64/mlnxofedinstall --user-spac
 
 # Install nccl
 ENV NCCL_DEBUG=INFO
-# ENV NCCL_DEBUG_FILE=mnt/output/nccl-debug.%p.log
-# ENV NCCL_TOPO_DUMP_FILE=mnt/output/nccl-topo.%p.xml
+ENV NCCL_DEBUG_FILE=/root/mnt/output/nccl-debug.log
+ENV NCCL_TOPO_DUMP_FILE=/root/mnt/output/nccl-topo.xml
 RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb && \
     dpkg -i cuda-keyring_1.0-1_all.deb && \
     apt-get update && \
