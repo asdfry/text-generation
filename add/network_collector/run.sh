@@ -1,1 +1,0 @@
-python collector.py -i 192.168.10.5:9100 -p http://101.202.0.9:30003/api/v1/query -s suffix
