@@ -51,7 +51,6 @@ if accelerator.process_index == 0:
 
     os.makedirs(dirpath, exist_ok=True)
     update_logger_config(dirpath)
-    move_nccl_outputs(dirpath)
 
     if args.use_mc:
         if not args.prometheus_ip or not args.target_node_ip:
@@ -170,6 +169,8 @@ model, optimizer, train_dataloader = accelerator.prepare(
 
 # Start training with profiler
 if accelerator.process_index == 0:
+    move_nccl_outputs(dirpath)
+
     with profile(
         activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
         schedule=schedule(wait=1, warmup=1, active=2, repeat=1),
