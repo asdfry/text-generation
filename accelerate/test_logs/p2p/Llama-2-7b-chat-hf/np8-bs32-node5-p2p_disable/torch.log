@@ -1,0 +1,154 @@
+2023-11-21 at 14:50:05 | INFO | __main__:84 | Start loading dataset: mnt/datasets/tldr_news
+2023-11-21 at 14:50:05 | INFO | __main__:90 | End loading dataset: mnt/datasets/tldr_news (rcv: -1, xmit: -1)
+2023-11-21 at 14:50:05 | INFO | __main__:95 | Start tokenizing dataset
+2023-11-21 at 14:50:06 | INFO | __main__:122 | End tokenizing dataset (rcv: -1, xmit: -1)
+2023-11-21 at 14:50:06 | INFO | __main__:139 | Train dataset size: 7138
+2023-11-21 at 14:50:06 | INFO | __main__:148 | Start loading model: Llama-2-7b-chat-hf
+2023-11-21 at 14:50:23 | INFO | __main__:154 | End loading model: Llama-2-7b-chat-hf (rcv: -1, xmit: -1)
+2023-11-21 at 14:50:28 | INFO | __main__:181 | Start training
+2023-11-21 at 14:50:38 | INFO | __main__:213 | [epoch 1] step:  1/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:50:41 | INFO | __main__:213 | [epoch 1] step:  2/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:50:44 | INFO | __main__:213 | [epoch 1] step:  3/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:50:46 | INFO | __main__:213 | [epoch 1] step:  4/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:50:55 | INFO | __main__:213 | [epoch 1] step:  5/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:50:58 | INFO | __main__:213 | [epoch 1] step:  6/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:01 | INFO | __main__:213 | [epoch 1] step:  7/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:03 | INFO | __main__:213 | [epoch 1] step:  8/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:06 | INFO | __main__:213 | [epoch 1] step:  9/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:08 | INFO | __main__:213 | [epoch 1] step: 10/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:11 | INFO | __main__:213 | [epoch 1] step: 11/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:13 | INFO | __main__:213 | [epoch 1] step: 12/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:16 | INFO | __main__:213 | [epoch 1] step: 13/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:19 | INFO | __main__:213 | [epoch 1] step: 14/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:21 | INFO | __main__:213 | [epoch 1] step: 15/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:24 | INFO | __main__:213 | [epoch 1] step: 16/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:26 | INFO | __main__:213 | [epoch 1] step: 17/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:29 | INFO | __main__:213 | [epoch 1] step: 18/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:31 | INFO | __main__:213 | [epoch 1] step: 19/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:34 | INFO | __main__:213 | [epoch 1] step: 20/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:37 | INFO | __main__:213 | [epoch 1] step: 21/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:39 | INFO | __main__:213 | [epoch 1] step: 22/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:42 | INFO | __main__:213 | [epoch 1] step: 23/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:44 | INFO | __main__:213 | [epoch 1] step: 24/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:47 | INFO | __main__:213 | [epoch 1] step: 25/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:50 | INFO | __main__:213 | [epoch 1] step: 26/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:52 | INFO | __main__:213 | [epoch 1] step: 27/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:55 | INFO | __main__:213 | [epoch 1] step: 28/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:51:55 | INFO | __main__:232 | [epoch 1] elapsed time: 87.06165647506714 sec
+2023-11-21 at 14:51:57 | INFO | __main__:213 | [epoch 2] step:  1/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:00 | INFO | __main__:213 | [epoch 2] step:  2/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:03 | INFO | __main__:213 | [epoch 2] step:  3/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:05 | INFO | __main__:213 | [epoch 2] step:  4/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:08 | INFO | __main__:213 | [epoch 2] step:  5/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:10 | INFO | __main__:213 | [epoch 2] step:  6/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:13 | INFO | __main__:213 | [epoch 2] step:  7/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:15 | INFO | __main__:213 | [epoch 2] step:  8/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:18 | INFO | __main__:213 | [epoch 2] step:  9/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:20 | INFO | __main__:213 | [epoch 2] step: 10/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:23 | INFO | __main__:213 | [epoch 2] step: 11/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:26 | INFO | __main__:213 | [epoch 2] step: 12/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:28 | INFO | __main__:213 | [epoch 2] step: 13/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:31 | INFO | __main__:213 | [epoch 2] step: 14/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:33 | INFO | __main__:213 | [epoch 2] step: 15/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:36 | INFO | __main__:213 | [epoch 2] step: 16/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:38 | INFO | __main__:213 | [epoch 2] step: 17/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:41 | INFO | __main__:213 | [epoch 2] step: 18/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:43 | INFO | __main__:213 | [epoch 2] step: 19/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:46 | INFO | __main__:213 | [epoch 2] step: 20/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:49 | INFO | __main__:213 | [epoch 2] step: 21/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:51 | INFO | __main__:213 | [epoch 2] step: 22/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:54 | INFO | __main__:213 | [epoch 2] step: 23/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:56 | INFO | __main__:213 | [epoch 2] step: 24/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:52:59 | INFO | __main__:213 | [epoch 2] step: 25/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:02 | INFO | __main__:213 | [epoch 2] step: 26/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:04 | INFO | __main__:213 | [epoch 2] step: 27/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:07 | INFO | __main__:213 | [epoch 2] step: 28/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:07 | INFO | __main__:232 | [epoch 2] elapsed time: 72.0767502784729 sec
+2023-11-21 at 14:53:09 | INFO | __main__:213 | [epoch 3] step:  1/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:12 | INFO | __main__:213 | [epoch 3] step:  2/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:15 | INFO | __main__:213 | [epoch 3] step:  3/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:17 | INFO | __main__:213 | [epoch 3] step:  4/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:20 | INFO | __main__:213 | [epoch 3] step:  5/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:22 | INFO | __main__:213 | [epoch 3] step:  6/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:25 | INFO | __main__:213 | [epoch 3] step:  7/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:27 | INFO | __main__:213 | [epoch 3] step:  8/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:30 | INFO | __main__:213 | [epoch 3] step:  9/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:33 | INFO | __main__:213 | [epoch 3] step: 10/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:35 | INFO | __main__:213 | [epoch 3] step: 11/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:38 | INFO | __main__:213 | [epoch 3] step: 12/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:40 | INFO | __main__:213 | [epoch 3] step: 13/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:43 | INFO | __main__:213 | [epoch 3] step: 14/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:45 | INFO | __main__:213 | [epoch 3] step: 15/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:48 | INFO | __main__:213 | [epoch 3] step: 16/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:50 | INFO | __main__:213 | [epoch 3] step: 17/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:53 | INFO | __main__:213 | [epoch 3] step: 18/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:56 | INFO | __main__:213 | [epoch 3] step: 19/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:53:58 | INFO | __main__:213 | [epoch 3] step: 20/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:01 | INFO | __main__:213 | [epoch 3] step: 21/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:03 | INFO | __main__:213 | [epoch 3] step: 22/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:06 | INFO | __main__:213 | [epoch 3] step: 23/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:08 | INFO | __main__:213 | [epoch 3] step: 24/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:11 | INFO | __main__:213 | [epoch 3] step: 25/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:14 | INFO | __main__:213 | [epoch 3] step: 26/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:16 | INFO | __main__:213 | [epoch 3] step: 27/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:19 | INFO | __main__:213 | [epoch 3] step: 28/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:19 | INFO | __main__:232 | [epoch 3] elapsed time: 72.0596113204956 sec
+2023-11-21 at 14:54:21 | INFO | __main__:213 | [epoch 4] step:  1/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:24 | INFO | __main__:213 | [epoch 4] step:  2/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:27 | INFO | __main__:213 | [epoch 4] step:  3/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:29 | INFO | __main__:213 | [epoch 4] step:  4/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:32 | INFO | __main__:213 | [epoch 4] step:  5/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:34 | INFO | __main__:213 | [epoch 4] step:  6/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:37 | INFO | __main__:213 | [epoch 4] step:  7/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:40 | INFO | __main__:213 | [epoch 4] step:  8/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:42 | INFO | __main__:213 | [epoch 4] step:  9/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:45 | INFO | __main__:213 | [epoch 4] step: 10/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:47 | INFO | __main__:213 | [epoch 4] step: 11/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:50 | INFO | __main__:213 | [epoch 4] step: 12/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:52 | INFO | __main__:213 | [epoch 4] step: 13/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:55 | INFO | __main__:213 | [epoch 4] step: 14/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:54:58 | INFO | __main__:213 | [epoch 4] step: 15/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:00 | INFO | __main__:213 | [epoch 4] step: 16/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:03 | INFO | __main__:213 | [epoch 4] step: 17/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:05 | INFO | __main__:213 | [epoch 4] step: 18/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:08 | INFO | __main__:213 | [epoch 4] step: 19/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:10 | INFO | __main__:213 | [epoch 4] step: 20/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:13 | INFO | __main__:213 | [epoch 4] step: 21/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:15 | INFO | __main__:213 | [epoch 4] step: 22/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:18 | INFO | __main__:213 | [epoch 4] step: 23/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:21 | INFO | __main__:213 | [epoch 4] step: 24/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:23 | INFO | __main__:213 | [epoch 4] step: 25/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:26 | INFO | __main__:213 | [epoch 4] step: 26/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:28 | INFO | __main__:213 | [epoch 4] step: 27/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:31 | INFO | __main__:213 | [epoch 4] step: 28/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:31 | INFO | __main__:232 | [epoch 4] elapsed time: 72.07060432434082 sec
+2023-11-21 at 14:55:34 | INFO | __main__:213 | [epoch 5] step:  1/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:36 | INFO | __main__:213 | [epoch 5] step:  2/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:39 | INFO | __main__:213 | [epoch 5] step:  3/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:41 | INFO | __main__:213 | [epoch 5] step:  4/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:44 | INFO | __main__:213 | [epoch 5] step:  5/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:47 | INFO | __main__:213 | [epoch 5] step:  6/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:49 | INFO | __main__:213 | [epoch 5] step:  7/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:52 | INFO | __main__:213 | [epoch 5] step:  8/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:54 | INFO | __main__:213 | [epoch 5] step:  9/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:57 | INFO | __main__:213 | [epoch 5] step: 10/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:55:59 | INFO | __main__:213 | [epoch 5] step: 11/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:02 | INFO | __main__:213 | [epoch 5] step: 12/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:05 | INFO | __main__:213 | [epoch 5] step: 13/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:07 | INFO | __main__:213 | [epoch 5] step: 14/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:10 | INFO | __main__:213 | [epoch 5] step: 15/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:12 | INFO | __main__:213 | [epoch 5] step: 16/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:15 | INFO | __main__:213 | [epoch 5] step: 17/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:17 | INFO | __main__:213 | [epoch 5] step: 18/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:20 | INFO | __main__:213 | [epoch 5] step: 19/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:23 | INFO | __main__:213 | [epoch 5] step: 20/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:25 | INFO | __main__:213 | [epoch 5] step: 21/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:28 | INFO | __main__:213 | [epoch 5] step: 22/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:30 | INFO | __main__:213 | [epoch 5] step: 23/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:33 | INFO | __main__:213 | [epoch 5] step: 24/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:35 | INFO | __main__:213 | [epoch 5] step: 25/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:38 | INFO | __main__:213 | [epoch 5] step: 26/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:40 | INFO | __main__:213 | [epoch 5] step: 27/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:43 | INFO | __main__:213 | [epoch 5] step: 28/28   loss: nan                  perplexity: nan                rcv: -1        xmit: -1        
+2023-11-21 at 14:56:43 | INFO | __main__:232 | [epoch 5] elapsed time: 72.05788826942444 sec
+2023-11-21 at 14:56:43 | INFO | __main__:242 | End training (total elapsed time: 398.4650790691376 sec)

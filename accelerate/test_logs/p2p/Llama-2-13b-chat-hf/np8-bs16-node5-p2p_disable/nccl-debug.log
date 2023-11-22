@@ -1,0 +1,58 @@
+pnode5:8232:8232 [5] NCCL INFO cudaDriverVersion 12000
+pnode5:8231:8231 [4] NCCL INFO Bootstrap : Using eno3:101.202.0.12<0>
+pnode5:8231:8231 [4] NCCL INFO NET/Plugin : No plugin found (libnccl-net.so), using internal implementation
+pnode5:8232:8471 [5] NCCL INFO NET/IB : Using [0]mlx5_1:1/IB [1]mlx5_2:1/RoCE [2]mlx5_7:1/IB [3]mlx5_8:1/RoCE [RO]; OOB eno3:101.202.0.12<0>
+pnode5:8232:8471 [5] NCCL INFO Using network IB
+pnode5:8233:8468 [6] NCCL INFO Setting affinity for GPU 6 to ffffffff,ffffff00,00000000,0000ffff,ffffffff,ff0pnode5:8230:8465 [3] NCCL INFO Trees [0] 4/-1/-1->3->2 [1] 4/-1/-1->3->2 [2] 4/-1/-1->3->2 [3] 4/-1/-1->3->2 [4] 4/-1/-1->3->2 [5] 4/-1/-1->3->2 [6] 4/-1/-1->3->2 [7] 4/-1/-1->3->2 [8] 4/-1/-1->3->2 [9] 4/-1/-1->3->2 [10] 4/-1/-1->3->2 [11] 4/-1/-1->3->2 [12] 4/-1/-1->3->2 [13] 4/-1/-1->3->2 [14] 4/pnode5:8227:8462 [0] NCCL INFO Channel 03/24 :    0   1   2   3   4   5   6   7
+pnode5:8227:8462 [0] NCCL INFO Channel 04/24 :    0   1   2   3   4   5   6   7
+pnode5:8227:8462 [0] NCpnode5:8230:846pnode5:8232:8471 [5] NCCL INFO Channel 00/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 01/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 02/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 03/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 04/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 05/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 06/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 07/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 08/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 09/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 10/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 11/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 12/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 13/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 14/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8231:8470 [4] NCCL INFO Channel 15/0 : 4[9d000] -> 5[c3000] via P2P/IPC
+pnode5:8231:8470 [4] NCCL INFO Channel 16/0 : 4[9d000] -> 5[c3000] via P2P/IPC
+pnode5:8231:8470 [4] NCCL INFO Channel 17/0 : 4[9d000] -> 5[c3000] via P2P/IPC
+pnode5:8231:8470 [4] NCCL INFO Channel 18/0 : 4[9d000] -> 5[c3000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 19/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 20/0 : 5[c3000] -> 6[d1000] via P2P/IPC
+pnode5:8231:8470 [4] NCCL INFO Channel 21/0 : 4[9d000] -> 5[c3000] via P2P/IPC
+pnode5:8231:8470 [4] NCCL INFO Channel 22/0 : 4[9d000] -> 5[c3000] via P2P/IPC
+pnode5:8231:8470 [4] NCCL INFO Channel 23/0 : 4[9d000] -> 5[c300pnode5:8228:846pnode5:8232:8471 [5] NCCL INFO Connepnode5:8228:846pnode5:8232:8471 [5] NCCL INFO Channel 00/0 : 5[c3000] -> 4[9d000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 01/0 : 5[c3000] -> 4[9d000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 02/0 : 5[c3000] -> 4[9d000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 03/0 : 5[c3000] -> 4[9d000] via P2P/IPC
+pnode5:8233:8468 [6] NCCL INFO Channel 04/0 : 6[d1000] -> 5[c3000] via P2P/IPC
+pnode5:8233:8468 [6] NCCL INFO Channel 05/0 : 6[d1000] -> 5[c3000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 06/0 : 5[c3000] -> 4[9d000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 07/0 : 5[c3000] -> 4[9d000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 08/0 : 5[c3000] -> 4[9d000] via P2P/IPC
+pnode5:8233:8468 [6] NCCL INFO Channel 09/0 : 6[d1000] -> 5[c3000] via P2P/IPC
+pnode5:8233:8468 [6] NCCL INFO Channel 10/0 : 6[d1000] -> 5[c3000] via P2P/IPC
+pnode5:8233:8468 [6] NCCL INFO Channel 11/0 : 6[d1000] -> 5[c3000] via P2P/IPC
+pnode5:8233:8468 [6] NCCL INFO Channel 12/0 : 6[d1000] -> 5[c3000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 13/0 : 5[c3000] -> 4[9d000] via P2P/IPC
+pnode5:8233:8468 [6] NCCL INFO Channel 14/0 : 6[d1000] -> 5[c3000] via P2P/IPC
+pnode5:8233:8468 [6] NCCL INFO Channel 15/0 : 6[d1000] -> 5[c3000] via P2P/IPC
+pnode5:8233:8468 [6] NCCL INFO Channel 16/0 : 6[d1000] -> 5[c3000] via P2P/IPC
+pnode5:8233:8468 [6] NCCL INFO Channel 17/0 : 6[d1000] -> 5[c3000] via P2P/IPC
+pnode5:8233:8468 [6] NCCL INFO Channel 18/0 : 6[d1000] -> 5[c3000] via P2P/IPC
+pnode5:8233:8468 [6] NCCL INFO Channel 19/0 : 6[d1000] -> 5[c3000] via P2P/IPC
+pnode5:8233:8468 [6] NCCL INFO Channel 20/0 : 6[d1000] -> 5[c3000] via P2P/IPC
+pnode5:8233:8468 [6] NCCL INFO Channel 21/0 : 6[d1000] -> 5[c3000] via P2P/IPC
+pnode5:8233:8468 [6] NCCL INFO Channel 22/0 : 6[d1000] -> 5[c3000] via P2P/IPC
+pnode5:8232:8471 [5] NCCL INFO Channel 23/0 : 5[c3000] -> 4[9d00pnode5:8228:846pnode5:8233:8468 [6] NCCL INFO Connected all trees
+pnode5:8233:8468 [6] NCCL INFO threadThresholds 8/8/64 | 64/8/64 | 512 | 512
+pnode5:8233:8468 [6] NCCL INFO 24 coll channels, 32 p2p channels, 32 p2p chapnode5:8230:8465 [3] NCCL INFO comm 0x5585cfb51280 rank 3 nranks 8 cudaDev 3 busId 61000 - Init COMPLETE
+ cudaDev 7 busId df000 - Init COMPLETE
+0x558bafc9e840 rank 0 nranks 8 cudaDev 0 busId 1b000 - Init COMPLETE

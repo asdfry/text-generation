@@ -56,7 +56,6 @@ cover/
 *.pot
 
 # Django stuff:
-*.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -168,7 +167,6 @@ authorized_keys
 key.pem
 hpcx-v2.16-gcc-mlnx_ofed-ubuntu22.04-cuda12-gdrcopy2-nccl2.18-x86_64
 MLNX_OFED_LINUX-5.8-3.0.7.0-ubuntu22.04-x86_64
-nccl-*.xml
 .deepspeed_env
 2023.10.17/
 2023.11.06/

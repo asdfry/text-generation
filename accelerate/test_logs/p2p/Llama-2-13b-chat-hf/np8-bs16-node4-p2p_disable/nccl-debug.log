@@ -1,0 +1,14 @@
+pnode4:2080:2080 [5] NCCL INFO cudaDriverVersion 12000
+pnode4:2080:2080 [5] NCCL INFO Bootstrap : Using enp226s0:101.202.0.7<0>
+pnode4:2080:2080 [5] NCCL INFO NET/Plugin : No plugin found (libnccl-net.so), using internal implementation
+pnode4:2082:2467 [7] NCCL INFO NET/IB : Using [0]mlx5_0:1/IB [1]mlx5_1:1/IB [2]mlx5_2:1/IB [3]mlx5_3:1/IB [4]mlx5_4:1/IB [5]mlx5_5:1/RoCE [6]mlx5_6:1/IB [7]mlx5_7:1/IB [8]mlx5_8:1/IB [9]mlx5_9:1/IB [10]mlx5_10:1/IB [11]mlx5_11:1/RoCE [RO]; OOB enp226s0:101.202.0.7<0>
+pnode4:2082:2467 [7] NCCL INFO Using network IB
+pnode4:2078:2464 [3] NCCL INFO NCCL_P2P_LEVEL set by environment to LOC
+pnode4:2078:2464 [3] NCCL INFO Setting affinity for GPU 3 to ffff0000,00000000,00000000,00000000,ffff0000
+pnode4:2077:2465 [pnode4:2082:2467 [7] NCCL INFO Trees [0] -1/-1/-1->7->6pnode4:2077:2465 [2] NCCL INFO Channel 00 : 2[47000] -> 3[4e000] via SHM/direct/direct
+pnode4:2077:2465 [2] NCCL INFO Channel 01 : 2[47000] -> 3[4e000] via SHM/direct/direct
+pnode4:pnode4:2076pnode4:2081:2462 [6] NCCL INFO Copnode4:pnode4:2076pnode4:20pnode4:2080:2463 [5] NCCL INFO Channel 00 : 5[90000] -> 4[87000] via SHM/direct/direct
+pnode4:2080:2463 [5] NCCL INFO Channel 01 : 5[90000] -> 4[pnodepnode4:2076:2466 [1] NCCL INFO Connected all trees
+pnode4:2076:2466 [1] NCCL INFO threadThresholds 8/8/64 | 64/8/64 | 512 | 512
+pnode4:2076:2466 [1] NCCL INFO 2 coll channels, 2 p2p channels, 2 p2p channels per pnodepnode4:2076:246pnode4:20pnode4:2080:2463 [5] NCCL INFO comm 0x55d084e1f340 rank 5 nranks 8 cudaDev 5 busId 90000 - Init COMPLETE
+sId 7000 - Init COMPLETE
