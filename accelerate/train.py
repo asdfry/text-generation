@@ -129,7 +129,6 @@ tokenized_datasets.set_format("torch")
 if accelerator.process_index == 0:
     real_io, last_io = get_io(last_io, args.logging_ethernet, args.logging_rdma)
     logger.info(f"End tokenizing dataset (rcv: {real_io['rcv']}, xmit: {real_io['xmit']})")
-    # logger.info(f"Valid dataset size: {len(valid_dataset)}")
 
 
 # Create dataloader
@@ -138,18 +137,11 @@ train_dataset = (
     .shuffle(seed=77)
     .select(range(int(tokenized_datasets["train"].num_rows * args.dataset_size)))
 )
-# valid_dataset = (
-#     tokenized_datasets["test"]
-#     .shuffle(seed=77)
-#     .select(range(int(tokenized_datasets["test"].num_rows * args.dataset_size)))
-# )
 
 if accelerator.process_index == 0:
     logger.info(f"Train dataset size: {len(train_dataset)}")
-    # logger.info(f"Valid dataset size: {len(valid_dataset)}")
 
 train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=args.batch_size)
-# valid_dataloader = DataLoader(valid_dataset, batch_size=args.batch_size)
 
 
 # Load model
@@ -157,11 +149,13 @@ if accelerator.process_index == 0:
     logger.info(f"Start loading model: {args.model_name}")
 
 model = AutoModelForCausalLM.from_pretrained(model_path)
-model, train_dataloader = accelerator.prepare(model, train_dataloader)
 
 if accelerator.process_index == 0:
     real_io, last_io = get_io(last_io, args.logging_ethernet, args.logging_rdma)
     logger.info(f"End loading model: {args.model_name} (rcv: {real_io['rcv']}, xmit: {real_io['xmit']})")
+
+if accelerator.state.distributed_type == "FSDP":
+    model = accelerator.prepare(model)
 
 
 # Set optimizer
@@ -170,7 +164,10 @@ if args.optimizer == "sgd":
 elif args.optimizer == "adamw":
     optimizer = AdamW(model.parameters(), lr=1e-5)
 
-optimizer = accelerator.prepare(optimizer)
+if accelerator.state.distributed_type == "DEEPSPEED":
+    model, optimizer, train_dataloader = accelerator.prepare(model, optimizer, train_dataloader)
+elif accelerator.state.distributed_type == "FSDP":
+    optimizer, train_dataloader = accelerator.prepare(optimizer, train_dataloader)
 
 
 # Start training with profiler

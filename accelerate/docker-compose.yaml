@@ -8,28 +8,29 @@ services:
       - 1040:1040
     shm_size: 1GB
     # network_mode: host
-    privileged: true
+    # privileged: true
     deploy:
       resources:
         reservations:
           devices:
           - driver: nvidia
-            device_ids: ['0', '1', '2', '3']
+            count: all
+            # device_ids: ['0', '1', '2', '3']
             capabilities: [gpu]
-  trainer-ontap:
-    image: asdfry/train-llm:20231128
-    volumes:
-      - /ontap/jsh/volume:/root/mnt
-    command: ["/bin/bash", "-c", "/usr/sbin/sshd -p 1041 && sleep infinity"]
-    ports:
-      - 1041:1041
-    shm_size: 1GB
-    # network_mode: host
-    privileged: true
-    deploy:
-      resources:
-        reservations:
-          devices:
-          - driver: nvidia
-            device_ids: ['4', '5', '6', '7']
-            capabilities: [gpu]
+  # trainer-ontap:
+  #   image: asdfry/train-llm:20231128
+  #   volumes:
+  #     - /ontap/jsh/volume:/root/mnt
+  #   command: ["/bin/bash", "-c", "/usr/sbin/sshd -p 1041 && sleep infinity"]
+  #   ports:
+  #     - 1041:1041
+  #   shm_size: 1GB
+  #   # network_mode: host
+  #   # privileged: true
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #         - driver: nvidia
+  #           device_ids: ['4', '5', '6', '7']
+  #           capabilities: [gpu]
