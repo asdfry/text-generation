@@ -151,15 +151,13 @@ if accelerator.process_index == 0:
 train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=args.batch_size)
 # valid_dataloader = DataLoader(valid_dataset, batch_size=args.batch_size)
 
-train_dataloader = accelerator.prepare(train_dataloader)
-
 
 # Load model
 if accelerator.process_index == 0:
     logger.info(f"Start loading model: {args.model_name}")
 
 model = AutoModelForCausalLM.from_pretrained(model_path)
-model = accelerator.prepare(model)
+model, train_dataloader = accelerator.prepare(model, train_dataloader)
 
 if accelerator.process_index == 0:
     real_io, last_io = get_io(last_io, args.logging_ethernet, args.logging_rdma)
@@ -237,6 +235,8 @@ if accelerator.process_index == 0:
 
             logger.info(f"[epoch {epoch + 1}] elapsed time: {time.time() - epoch_time} sec")
 
+            save_time = time.time()
+
             unwrapped_model = accelerator.unwrap_model(model)
             unwrapped_model.save_pretrained(
                 f"{dirpath}/epoch-{epoch + 1}",
@@ -248,7 +248,8 @@ if accelerator.process_index == 0:
             real_io, last_io = get_io(last_io, args.logging_ethernet, args.logging_rdma)
             logger.info(
                 f"[epoch {epoch + 1}] model path: {dirpath}/epoch-{epoch + 1}/ "
-                f"(rcv: {real_io['rcv']}, xmit: {real_io['xmit']})"
+                f"(elapsed time: {time.time() - save_time} sec, "
+                f"rcv: {real_io['rcv']}, xmit: {real_io['xmit']})"
             )
 
     logger.info(f"End training (total elapsed time: {time.time() - start_time} sec)")
