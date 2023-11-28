@@ -3,7 +3,7 @@ import time
 import torch
 import argparse
 
-from utils import logger, update_logger_config, move_nccl_outputs, set_dataset, get_io
+from utils import logger, update_logger_config, move_nccl_outputs, get_io
 from datasets import load_from_disk
 from accelerate import Accelerator
 from torch.optim import SGD, AdamW
@@ -33,6 +33,8 @@ parser.add_argument("-mc", "--use_mc", action="store_true")
 parser.add_argument("-mc_p", "--prometheus_ip", type=str, default=None)
 parser.add_argument("-mc_t", "--target_node_ip", type=str, default=None)
 
+parser.add_argument("-nc", "--not_container", type=str, default=None)
+
 args = parser.parse_args()
 
 
@@ -40,14 +42,18 @@ args = parser.parse_args()
 accelerator = Accelerator()
 
 
+# Set root dir
+root_dir = args.not_container if args.not_container else "mnt"
+
+if args.custom_name:
+    dirpath = f"{root_dir}/output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}-{args.custom_name}"
+else:
+    dirpath = f"{root_dir}/output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
+
+
 # Set logger & Start metric collector
 if accelerator.process_index == 0:
     start_time = time.time()
-
-    if args.custom_name:
-        dirpath = f"mnt/output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}-{args.custom_name}"
-    else:
-        dirpath = f"mnt/output/{args.model_name}/np{accelerator.num_processes}-bs{args.batch_size}"
 
     os.makedirs(dirpath, exist_ok=True)
     update_logger_config(dirpath)
@@ -66,8 +72,14 @@ if accelerator.process_index == 0:
 
 
 # Set model, dataset
-model_path = f"mnt/pretrained-models/{args.model_name}"
-dataset_path, column_name = set_dataset(args.dataset_name)
+model_path = f"{root_dir}/pretrained-models/{args.model_name}"
+
+if args.dataset_name == "tldr":
+    dataset_path = f"{root_dir}/datasets/tldr_news"
+    column_name = "content"
+elif args.dataset_name == "redp":
+    dataset_path = f"{root_dir}/datasets/RedPajama-Data-V2"
+    column_name = "raw_content"
 
 
 # Check first counter
@@ -139,12 +151,15 @@ if accelerator.process_index == 0:
 train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=args.batch_size)
 # valid_dataloader = DataLoader(valid_dataset, batch_size=args.batch_size)
 
+train_dataloader = accelerator.prepare(train_dataloader)
+
 
 # Load model
 if accelerator.process_index == 0:
     logger.info(f"Start loading model: {args.model_name}")
 
 model = AutoModelForCausalLM.from_pretrained(model_path)
+model = accelerator.prepare(model)
 
 if accelerator.process_index == 0:
     real_io, last_io = get_io(last_io, args.logging_ethernet, args.logging_rdma)
@@ -157,14 +172,7 @@ if args.optimizer == "sgd":
 elif args.optimizer == "adamw":
     optimizer = AdamW(model.parameters(), lr=1e-5)
 
-
-# Ready for training with accelerate
-model, optimizer, train_dataloader = accelerator.prepare(
-    model,
-    optimizer,
-    train_dataloader,
-    # valid_dataloader,
-)
+optimizer = accelerator.prepare(optimizer)
 
 
 # Start training with profiler
@@ -234,7 +242,9 @@ if accelerator.process_index == 0:
                 f"{dirpath}/epoch-{epoch + 1}",
                 is_main_process=accelerator.is_main_process,
                 save_function=accelerator.save,
+                state_dict=accelerator.get_state_dict(model, unwrap=False),
             )
+
             real_io, last_io = get_io(last_io, args.logging_ethernet, args.logging_rdma)
             logger.info(
                 f"[epoch {epoch + 1}] model path: {dirpath}/epoch-{epoch + 1}/ "
@@ -261,6 +271,14 @@ else:
             optimizer.step()
             optimizer.zero_grad()
         # <<< Train <<<
+
+        unwrapped_model = accelerator.unwrap_model(model)
+        unwrapped_model.save_pretrained(
+            f"{dirpath}/epoch-{epoch + 1}",
+            is_main_process=accelerator.is_main_process,
+            save_function=accelerator.save,
+            state_dict=accelerator.get_state_dict(model, unwrap=False),
+        )
 
         # >>> Valid >>>
         # model.eval()

@@ -34,16 +34,6 @@ def move_nccl_outputs(dirpath):
         pass
 
 
-def set_dataset(dataset_name):
-    if dataset_name == "tldr":
-        dataset_path = "mnt/datasets/tldr_news"
-        column_name = "content"
-    elif dataset_name == "redp":
-        dataset_path = "mnt/datasets/RedPajama-Data-V2"
-        column_name = "raw_content"
-    return dataset_path, column_name
-
-
 def get_io(last_io, eth, rdma):
     if eth:
         cur_io = get_ethernet_io(eth)
