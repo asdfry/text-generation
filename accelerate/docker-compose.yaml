@@ -3,12 +3,11 @@ services:
     image: asdfry/train-llm:20231128
     volumes:
       - /gpfs/jsh/volume:/root/mnt
-    command: ["/bin/bash", "-c", "/usr/sbin/sshd -p 1041 && sleep infinity"]
-    # ports:
-    #   - 1040:1040
-    #   - 1041:1041
+    command: ["/bin/bash", "-c", "/usr/sbin/sshd -p 1040 && sleep infinity"]
+    ports:
+      - 1040:1040
     shm_size: 1GB
-    network_mode: host
+    # network_mode: host
     privileged: true
     deploy:
       resources:
@@ -22,11 +21,10 @@ services:
     volumes:
       - /ontap/jsh/volume:/root/mnt
     command: ["/bin/bash", "-c", "/usr/sbin/sshd -p 1041 && sleep infinity"]
-    # ports:
-    #   - 1040:1040
-    #   - 1041:1041
+    ports:
+      - 1041:1041
     shm_size: 1GB
-    network_mode: host
+    # network_mode: host
     privileged: true
     deploy:
       resources:
