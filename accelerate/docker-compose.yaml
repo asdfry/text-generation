@@ -1,6 +1,6 @@
 services:
   trainer-gpfs:
-    image: asdfry/train-llm:20231128
+    image: asdfry/train-llm:20231129
     volumes:
       - /gpfs/jsh/volume:/root/mnt
     command: ["/bin/bash", "-c", "/usr/sbin/sshd -p 1040 && sleep infinity"]
@@ -18,7 +18,7 @@ services:
             # device_ids: ['0', '1', '2', '3']
             capabilities: [gpu]
   # trainer-ontap:
-  #   image: asdfry/train-llm:20231128
+  #   image: asdfry/train-llm:20231129
   #   volumes:
   #     - /ontap/jsh/volume:/root/mnt
   #   command: ["/bin/bash", "-c", "/usr/sbin/sshd -p 1041 && sleep infinity"]
