@@ -148,7 +148,7 @@ train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=args.batch
 if accelerator.process_index == 0:
     logger.info(f"Start loading model: {args.model_name}")
 
-model = AutoModelForCausalLM.from_pretrained(model_path)
+model = AutoModelForCausalLM.from_pretrained(model_path, use_flash_attention_2=True)
 
 if accelerator.process_index == 0:
     real_io, last_io = get_io(last_io, args.logging_ethernet, args.logging_rdma)

@@ -49,7 +49,8 @@ RUN apt-get install -y curl python3.10-dev python3.10-distutils && \
     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
     python3 get-pip.py && \
     pip install --no-cache-dir -r requirements.txt && \
-    pip install deepspeed==0.10.3
+    pip install flash-attn --no-build-isolation && \
+    pip install deepspeed==0.12.3
 
 # Install git lfs
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \

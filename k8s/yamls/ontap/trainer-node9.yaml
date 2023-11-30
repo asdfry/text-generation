@@ -19,7 +19,7 @@ spec:
     - /bin/bash
     - -c
     - /usr/sbin/sshd -p 1041 && sleep infinity
-    image: asdfry/train-llm:20231129
+    image: asdfry/train-llm:20231201
     name: app
     ports:
     - containerPort: 1041
