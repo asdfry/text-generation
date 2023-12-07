@@ -1,0 +1,51 @@
+2023-12-06 at 05:59:55 | INFO | __main__:93 | Start loading dataset: mnt/datasets/tldr_news
+2023-12-06 at 05:59:55 | INFO | __main__:99 | End loading dataset: mnt/datasets/tldr_news (rcv: -1, xmit: -1)
+2023-12-06 at 05:59:55 | INFO | __main__:104 | Start tokenizing dataset
+2023-12-06 at 05:59:55 | INFO | __main__:131 | End tokenizing dataset (rcv: -1, xmit: -1)
+2023-12-06 at 05:59:55 | INFO | __main__:142 | Train dataset size: 7138
+2023-12-06 at 05:59:55 | INFO | __main__:149 | Start loading model: Llama-2-70b-chat-hf
+2023-12-06 at 06:04:09 | INFO | __main__:155 | End loading model: Llama-2-70b-chat-hf (rcv: -1, xmit: -1)
+2023-12-06 at 06:05:00 | INFO | __main__:182 | Start training
+2023-12-06 at 06:05:26 | INFO | __main__:214 | [epoch 1] step:  1/19   loss: 3.9734392166137695   perplexity: 53.16706848144531  rcv: -1        xmit: -1        
+2023-12-06 at 06:05:38 | INFO | __main__:214 | [epoch 1] step:  2/19   loss: 3.3003973960876465   perplexity: 27.123416900634766 rcv: -1        xmit: -1        
+2023-12-06 at 06:05:50 | INFO | __main__:214 | [epoch 1] step:  3/19   loss: 2.9668538570404053   perplexity: 19.430692672729492 rcv: -1        xmit: -1        
+2023-12-06 at 06:06:02 | INFO | __main__:214 | [epoch 1] step:  4/19   loss: 2.8220038414001465   perplexity: 16.810501098632812 rcv: -1        xmit: -1        
+2023-12-06 at 06:08:28 | INFO | __main__:214 | [epoch 1] step:  5/19   loss: 3.5090701580047607   perplexity: 33.417179107666016 rcv: -1        xmit: -1        
+2023-12-06 at 06:08:39 | INFO | __main__:214 | [epoch 1] step:  6/19   loss: 3.255946159362793    perplexity: 25.944150924682617 rcv: -1        xmit: -1        
+2023-12-06 at 06:08:51 | INFO | __main__:214 | [epoch 1] step:  7/19   loss: 4.986175537109375    perplexity: 146.37554931640625 rcv: -1        xmit: -1        
+2023-12-06 at 06:09:03 | INFO | __main__:214 | [epoch 1] step:  8/19   loss: 5.645955562591553    perplexity: 283.14398193359375 rcv: -1        xmit: -1        
+2023-12-06 at 06:09:14 | INFO | __main__:214 | [epoch 1] step:  9/19   loss: 5.216813087463379    perplexity: 184.34576416015625 rcv: -1        xmit: -1        
+2023-12-06 at 06:09:27 | INFO | __main__:214 | [epoch 1] step: 10/19   loss: 4.926882266998291    perplexity: 137.94876098632812 rcv: -1        xmit: -1        
+2023-12-06 at 06:09:38 | INFO | __main__:214 | [epoch 1] step: 11/19   loss: 5.358201503753662    perplexity: 212.34271240234375 rcv: -1        xmit: -1        
+2023-12-06 at 06:09:50 | INFO | __main__:214 | [epoch 1] step: 12/19   loss: 5.753461837768555    perplexity: 315.28021240234375 rcv: -1        xmit: -1        
+2023-12-06 at 06:10:02 | INFO | __main__:214 | [epoch 1] step: 13/19   loss: 6.6165385246276855   perplexity: 747.3536376953125  rcv: -1        xmit: -1        
+2023-12-06 at 06:10:14 | INFO | __main__:214 | [epoch 1] step: 14/19   loss: 6.332681655883789    perplexity: 562.6633911132812  rcv: -1        xmit: -1        
+2023-12-06 at 06:10:26 | INFO | __main__:214 | [epoch 1] step: 15/19   loss: 6.076067924499512    perplexity: 435.3141174316406  rcv: -1        xmit: -1        
+2023-12-06 at 06:10:38 | INFO | __main__:214 | [epoch 1] step: 16/19   loss: 6.2682037353515625   perplexity: 527.5289916992188  rcv: -1        xmit: -1        
+2023-12-06 at 06:10:51 | INFO | __main__:214 | [epoch 1] step: 17/19   loss: 6.814716815948486    perplexity: 911.158447265625   rcv: -1        xmit: -1        
+2023-12-06 at 06:11:02 | INFO | __main__:214 | [epoch 1] step: 18/19   loss: 6.7462615966796875   perplexity: 850.8718872070312  rcv: -1        xmit: -1        
+2023-12-06 at 06:11:15 | INFO | __main__:214 | [epoch 1] step: 19/19   loss: 6.641800403594971    perplexity: 766.4737548828125  rcv: -1        xmit: -1        
+2023-12-06 at 06:11:15 | INFO | __main__:233 | [epoch 1] elapsed time: 375.00775480270386 sec
+2023-12-06 at 06:13:45 | INFO | __main__:246 | [epoch 1] model path: mnt/output/Llama-2-70b-chat-hf/np384-bs1/epoch-1/ (elapsed time: 149.3868989944458 sec, rcv: -1, xmit: -1)
+2023-12-06 at 06:13:57 | INFO | __main__:214 | [epoch 2] step:  1/19   loss: 3.9728870391845703   perplexity: 53.13772201538086  rcv: -1        xmit: -1        
+2023-12-06 at 06:14:10 | INFO | __main__:214 | [epoch 2] step:  2/19   loss: 3.3016977310180664   perplexity: 27.158706665039062 rcv: -1        xmit: -1        
+2023-12-06 at 06:14:21 | INFO | __main__:214 | [epoch 2] step:  3/19   loss: 2.9675605297088623   perplexity: 19.444427490234375 rcv: -1        xmit: -1        
+2023-12-06 at 06:14:34 | INFO | __main__:214 | [epoch 2] step:  4/19   loss: 2.8224730491638184   perplexity: 16.818391799926758 rcv: -1        xmit: -1        
+2023-12-06 at 06:14:46 | INFO | __main__:214 | [epoch 2] step:  5/19   loss: 3.508880615234375    perplexity: 33.410850524902344 rcv: -1        xmit: -1        
+2023-12-06 at 06:14:57 | INFO | __main__:214 | [epoch 2] step:  6/19   loss: 3.2565364837646484   perplexity: 25.959470748901367 rcv: -1        xmit: -1        
+2023-12-06 at 06:15:10 | INFO | __main__:214 | [epoch 2] step:  7/19   loss: 4.985687255859375    perplexity: 146.30409240722656 rcv: -1        xmit: -1        
+2023-12-06 at 06:15:22 | INFO | __main__:214 | [epoch 2] step:  8/19   loss: 5.645258903503418    perplexity: 282.9468078613281  rcv: -1        xmit: -1        
+2023-12-06 at 06:15:33 | INFO | __main__:214 | [epoch 2] step:  9/19   loss: 5.216328144073486    perplexity: 184.2563934326172  rcv: -1        xmit: -1        
+2023-12-06 at 06:15:47 | INFO | __main__:214 | [epoch 2] step: 10/19   loss: 4.926486492156982    perplexity: 137.8941650390625  rcv: -1        xmit: -1        
+2023-12-06 at 06:15:59 | INFO | __main__:214 | [epoch 2] step: 11/19   loss: 5.3570146560668945   perplexity: 212.09085083007812 rcv: -1        xmit: -1        
+2023-12-06 at 06:16:11 | INFO | __main__:214 | [epoch 2] step: 12/19   loss: 5.7521796226501465   perplexity: 314.876220703125   rcv: -1        xmit: -1        
+2023-12-06 at 06:16:24 | INFO | __main__:214 | [epoch 2] step: 13/19   loss: 6.614630699157715    perplexity: 745.92919921875    rcv: -1        xmit: -1        
+2023-12-06 at 06:16:35 | INFO | __main__:214 | [epoch 2] step: 14/19   loss: 6.331295490264893    perplexity: 561.884033203125   rcv: -1        xmit: -1        
+2023-12-06 at 06:16:49 | INFO | __main__:214 | [epoch 2] step: 15/19   loss: 6.074872016906738    perplexity: 434.7938537597656  rcv: -1        xmit: -1        
+2023-12-06 at 06:17:01 | INFO | __main__:214 | [epoch 2] step: 16/19   loss: 6.266770362854004    perplexity: 526.7733764648438  rcv: -1        xmit: -1        
+2023-12-06 at 06:17:16 | INFO | __main__:214 | [epoch 2] step: 17/19   loss: 6.812775135040283    perplexity: 909.3909912109375  rcv: -1        xmit: -1        
+2023-12-06 at 06:17:27 | INFO | __main__:214 | [epoch 2] step: 18/19   loss: 6.744215488433838    perplexity: 849.1327514648438  rcv: -1        xmit: -1        
+2023-12-06 at 06:17:43 | INFO | __main__:214 | [epoch 2] step: 19/19   loss: 6.64004373550415     perplexity: 765.1284790039062  rcv: -1        xmit: -1        
+2023-12-06 at 06:17:43 | INFO | __main__:233 | [epoch 2] elapsed time: 237.9386875629425 sec
+2023-12-06 at 06:20:30 | INFO | __main__:246 | [epoch 2] model path: mnt/output/Llama-2-70b-chat-hf/np384-bs1/epoch-2/ (elapsed time: 167.6115162372589 sec, rcv: -1, xmit: -1)
+2023-12-06 at 06:20:30 | INFO | __main__:252 | End training (total elapsed time: 1234.9910912513733 sec)
